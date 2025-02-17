@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server
+    environment:
+      SA_PASSWORD: "Kolobok@12345"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD", "sqlcmd", "-U", "sa", "-P", "Kolobok@12345", "-Q", "SELECT 1"]
+      interval: 30s
+      retries: 3
+
+  web:
+    build:
+      context: ./Web_Library.API
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=db,1433;Initial Catalog=LibraryDB;User ID=sa;Password=Kolobok@12345;TrustServerCertificate=True;
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 60s
+      retries: 5
+
+  ui:
+    build:
+      context: ./Web_Library.ui
+      dockerfile: Dockerfile
+    ports:
+      - "5005:80"
+    depends_on:
+      web:
+        condition: service_healthy
+    environment:
+      - API_BASE_URL=http://web:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      retries: 3

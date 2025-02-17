@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Новый профиль",
+    "Projects": [
+      {
+        "Path": "Web_Library.API\\Web_Library.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Web_Library.UI\\web_library.ui.esproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

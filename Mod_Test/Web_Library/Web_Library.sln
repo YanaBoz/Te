@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Library.API", "Web_Library.API\Web_Library.API.csproj", "{9F98A691-D979-45B1-8FE6-B95B8435A785}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Library.Test", "Web_Library.Test\Web_Library.Test.csproj", "{EBEC4CAF-411B-4E94-982A-F308927E9C2C}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "web_library.ui", "Web_Library.UI\web_library.ui.esproj", "{C34FFE3D-DBD5-494F-AE87-81112E52F805}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Union", "Union", "{49D8AFB6-0024-4136-BFF0-AB836577A760}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F98A691-D979-45B1-8FE6-B95B8435A785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F98A691-D979-45B1-8FE6-B95B8435A785}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F98A691-D979-45B1-8FE6-B95B8435A785}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F98A691-D979-45B1-8FE6-B95B8435A785}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBEC4CAF-411B-4E94-982A-F308927E9C2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBEC4CAF-411B-4E94-982A-F308927E9C2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBEC4CAF-411B-4E94-982A-F308927E9C2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBEC4CAF-411B-4E94-982A-F308927E9C2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C34FFE3D-DBD5-494F-AE87-81112E52F805}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C34FFE3D-DBD5-494F-AE87-81112E52F805}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C34FFE3D-DBD5-494F-AE87-81112E52F805}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C34FFE3D-DBD5-494F-AE87-81112E52F805}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C34FFE3D-DBD5-494F-AE87-81112E52F805}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C34FFE3D-DBD5-494F-AE87-81112E52F805}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
