@@ -57,7 +57,6 @@ namespace Web_Library.API.Controllers
             var author = await _authorRepository.GetByIdAsync(id);
             if (author == null) return NotFound();
 
-            // Delete all books associated with this author
             await _bookRepository.DeleteBooksByAuthorIdAsync(id);
 
             await _authorRepository.DeleteAsync(id);

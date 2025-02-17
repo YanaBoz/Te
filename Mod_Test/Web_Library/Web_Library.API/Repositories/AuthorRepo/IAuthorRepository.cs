@@ -12,6 +12,6 @@ namespace Web_Library.API.Repositories.AuthorRepo
         Task<string?> GetAuthorFullName(int authorId);
         Task DeleteAsync(int id);
         Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorId);
-        Task<bool> ExistsAsync(int authorId);  // Add ExistsAsync method definition
+        Task<bool> ExistsAsync(int authorId); 
     }
 }

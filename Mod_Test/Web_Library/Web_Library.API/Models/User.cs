@@ -4,7 +4,7 @@ namespace Web_Library.API.Models
 {
     public class User
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString(); // Уникальный идентификатор
+        public string Id { get; set; } = Guid.NewGuid().ToString(); 
 
         [Required]
         public string Username { get; set; } = string.Empty;
@@ -12,7 +12,7 @@ namespace Web_Library.API.Models
         [Required]
         public string FullName { get; set; } = string.Empty;
 
-        public string PasswordHash { get; set; } = string.Empty; // Хранение хэша пароля
+        public string PasswordHash { get; set; } = string.Empty; 
 
         public string? Role { get; set; } = "User";
 

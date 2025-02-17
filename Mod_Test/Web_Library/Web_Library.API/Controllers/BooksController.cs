@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Web_Library.API.Models;
 using Web_Library.API.Repositories.AuthorRepo;
 using Web_Library.API.Repositories.BookRepo;
@@ -18,18 +15,18 @@ namespace Web_Library.API.Controllers
         private readonly IBookRepository _bookRepository;
         private readonly IUserService _userService;
         private readonly IAuthorRepository _authorRepository;
-        private readonly IGenreRepository _genreRepository;  // Added Genre Repository
+        private readonly IGenreRepository _genreRepository;  
 
         public BooksController(
             IBookRepository bookRepository,
             IUserService userService,
             IAuthorRepository authorRepository,
-            IGenreRepository genreRepository) // Injecting genre repository
+            IGenreRepository genreRepository) 
         {
             _bookRepository = bookRepository;
             _userService = userService;
             _authorRepository = authorRepository;
-            _genreRepository = genreRepository;  // Assigning genre repository
+            _genreRepository = genreRepository;  
         }
 
         // Получить все книги
@@ -48,7 +45,7 @@ namespace Web_Library.API.Controllers
             {
                 book.Id,
                 book.Title,
-                GenreName = _genreRepository.GetByIdAsync(book.GenreID).Result?.Name, // Corrected method name here
+                GenreName = _genreRepository.GetByIdAsync(book.GenreID).Result?.Name,
                 book.Quantity,
                 AuthorName = _authorRepository.GetAuthorFullName(book.AuthorID).Result // Получаем ФИО автора
             });

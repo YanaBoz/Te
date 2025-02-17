@@ -5,10 +5,10 @@ import API_BASE_URL from '../config';
 const MyBooks = () => {
     const [myBooks, setMyBooks] = useState([]);
     const [overdueBooks, setOverdueBooks] = useState([]);
-    const [allOverdueBooks, setAllOverdueBooks] = useState([]); // To store all overdue books
+    const [allOverdueBooks, setAllOverdueBooks] = useState([]); 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [isAdmin, setIsAdmin] = useState(false); // State to check if the user is an admin
+    const [isAdmin, setIsAdmin] = useState(false); 
 
     const getCurrentUser = () => JSON.parse(localStorage.getItem('currentUser'));
     const currentUser = getCurrentUser();
@@ -53,7 +53,6 @@ const MyBooks = () => {
         }
     };
 
-    // Fetch user role to determine if user is an admin
     const fetchUserRole = async () => {
         if (!token) return;
         try {
@@ -67,16 +66,14 @@ const MyBooks = () => {
         }
     };
 
-    // Fetch all overdue books and handle 404 gracefully
     const fetchAllOverdueBooks = async () => {
         try {
-            const response = await axios.get('https://localhost:32821/api/Books/overdue', {
+            const response = await axios.get(`${API_BASE_URL}/Books/overdue`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setAllOverdueBooks(response.data); // Assuming you're using this state to store overdue books
+            setAllOverdueBooks(response.data); 
         } catch (error) {
             if (error.response?.status === 404) {
-                // If no overdue books, just inform the user.
                 setAllOverdueBooks([]);
                 setError('No overdue books available.');
             } else {
@@ -87,7 +84,7 @@ const MyBooks = () => {
 
 
     useEffect(() => {
-        fetchUserRole(); // Fetch user role to check if admin
+        fetchUserRole(); 
         const loadBooks = async () => {
             try {
                 await Promise.all([
@@ -144,7 +141,6 @@ const MyBooks = () => {
                 )}
             </ul>
 
-            {/* If the user is an admin, show the button to fetch all overdue books */}
             {isAdmin && (
                 <div>
                     <button onClick={fetchAllOverdueBooks}>Show All Overdue Books</button>

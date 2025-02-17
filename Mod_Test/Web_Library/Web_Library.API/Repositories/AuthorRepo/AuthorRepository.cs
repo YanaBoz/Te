@@ -71,7 +71,6 @@ namespace Web_Library.API.Repositories.AuthorRepo
             return author?.Books ?? new List<Book>();
         }
 
-        // Implement ExistsAsync method
         public async Task<bool> ExistsAsync(int authorId)
         {
             return await _context.Authors.AnyAsync(a => a.Id == authorId);

@@ -16,7 +16,7 @@ namespace Web_Library.Test
         public AuthorsControllerTests()
         {
             _mockAuthorRepository = new Mock<IAuthorRepository>();
-            _controller = new AuthorsController(_mockAuthorRepository.Object, null); // Assuming IBookRepository is not needed for these tests
+            _controller = new AuthorsController(_mockAuthorRepository.Object, null);
         }
 
         [Fact]

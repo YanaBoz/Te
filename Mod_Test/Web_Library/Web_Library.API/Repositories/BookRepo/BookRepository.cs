@@ -11,12 +11,12 @@ namespace Web_Library.API.Repositories.BookRepo
     public class BookRepository : IBookRepository
     {
         private readonly AppDbContext _context;
-        private readonly IGenreRepository _genreRepository; // Added genre repository
+        private readonly IGenreRepository _genreRepository; 
 
         public BookRepository(AppDbContext context, IGenreRepository genreRepository)
         {
             _context = context;
-            _genreRepository = genreRepository; // Injected genre repository
+            _genreRepository = genreRepository; 
         }
 
         public async Task<IEnumerable<Book>> GetAllAsync()

@@ -10,7 +10,7 @@ namespace Web_Library.API.Data
         public DbSet<Author> Authors { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        public DbSet<Genre> Genres { get; set; } // Add DbSet for Genre
+        public DbSet<Genre> Genres { get; set; } 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     }

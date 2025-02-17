@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import API_BASE_URL from '../config'; // Импортируйте базовый URL
+import API_BASE_URL from '../config'; 
 
 const PrivateRoute = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);

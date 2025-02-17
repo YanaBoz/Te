@@ -6,7 +6,6 @@ namespace Web_Library.API.Data
     {
         public static void Seed(AppDbContext context)
         {
-            // Check if the database is already populated, if not, seed it
             if (!context.Authors.Any())
             {
                 var authors = new List<Author>
@@ -23,7 +22,7 @@ namespace Web_Library.API.Data
                         {
                             ISBN = "9780747532743",
                             Title = "Harry Potter and the Philosopher's Stone",
-                            GenreID = 1, // Assume this GenreID exists
+                            GenreID = 1, 
                             Genre = "Fantasy",
                             Description = "A young wizard embarks on his first year at Hogwarts.",
                             Quantity = 5,
@@ -43,7 +42,7 @@ namespace Web_Library.API.Data
                         {
                             ISBN = "9780451524935",
                             Title = "1984",
-                            GenreID = 2, // Assume this GenreID exists
+                            GenreID = 2, 
                             Genre = "Dystopian",
                             Description = "A dystopian novel set in a totalitarian society.",
                             Quantity = 3,
@@ -57,7 +56,6 @@ namespace Web_Library.API.Data
                 context.SaveChanges();
             }
 
-            // Check if Genres exist, if not, create some
             if (!context.Genres.Any())
             {
                 var genres = new List<Genre>
@@ -70,13 +68,12 @@ namespace Web_Library.API.Data
                 context.SaveChanges();
             }
 
-            // Check if Users exist, if not, create one
             if (!context.Users.Any())
             {
                 var user = new User
                 {
                     Username = "john_doe",
-                    PasswordHash = "hashed_password", // Replace with actual hashed password
+                    PasswordHash = "hashed_password",
                     Role = "User"
                 };
                 context.Users.Add(user);

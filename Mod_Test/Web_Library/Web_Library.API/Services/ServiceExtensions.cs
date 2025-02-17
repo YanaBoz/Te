@@ -11,7 +11,6 @@ namespace Web_Library.API.Services
     {
         public static void AddCustomServices(this IServiceCollection services, IConfiguration configuration)
         {
-            // JWT Authentication setup
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -27,21 +26,18 @@ namespace Web_Library.API.Services
                     };
                 });
 
-            // Authorization policies
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
                 options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
             });
 
-            // Register services
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserService, UserService>();
 
-            // Register repositories
             services.AddScoped<IAuthorRepository, AuthorRepository>();
             services.AddScoped<IBookRepository, BookRepository>();
-            services.AddScoped<IGenreRepository, GenreRepository>(); // Ensure GenreRepository is registered
+            services.AddScoped<IGenreRepository, GenreRepository>();
         }
     }
 }

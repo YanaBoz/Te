@@ -52,7 +52,7 @@ namespace Web_Library.API.Services
 
         public async Task<User> GetUserByIdAsync(string userId)
         {
-            return await _context.Users.FindAsync(userId); // Assuming you're using EF Core
+            return await _context.Users.FindAsync(userId); 
         }
 
         private string HashPassword(string password)

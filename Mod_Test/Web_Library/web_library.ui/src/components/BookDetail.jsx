@@ -87,7 +87,7 @@ const BookDetail = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 alert('You have successfully borrowed the book!');
-                fetchBook(); // Refresh book info after borrowing
+                fetchBook(); 
             } catch (error) {
                 setError('Error borrowing the book');
             }
@@ -137,8 +137,8 @@ const BookDetail = () => {
     };
 
     useEffect(() => {
-        fetchUserRole(); // Fetch user role
-        fetchBook(); // Fetch book details
+        fetchUserRole();
+        fetchBook(); 
     }, [id, token]);
 
     if (loading) return <p>Loading...</p>;

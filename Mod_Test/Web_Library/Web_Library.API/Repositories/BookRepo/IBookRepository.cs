@@ -16,6 +16,6 @@ namespace Web_Library.API.Repositories.BookRepo
         Task<IEnumerable<Book>> GetOverdueBooksAsync();
         Task<IEnumerable<Book>> GetOverdueBooksForUserAsync(string userId);
         Task DeleteBooksByAuthorIdAsync(int authorId);
-        Task<bool> IssueBook(int bookId, string userId); // Метод для выдачи книги
+        Task<bool> IssueBook(int bookId, string userId);
     }
 }

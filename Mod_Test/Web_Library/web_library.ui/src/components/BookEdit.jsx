@@ -11,7 +11,7 @@ const BookEdit = () => {
     const [quantity, setQuantity] = useState(0);
     const [authorId, setAuthorId] = useState('');
     const [imageUrl, setImageUrl] = useState('');
-    const [genres, setGenres] = useState([]);  // Список жанров
+    const [genres, setGenres] = useState([]); 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();

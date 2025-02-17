@@ -50,17 +50,17 @@
 
 /* Стили для заголовка */
 header {
-    position: fixed; /* Фиксированное положение */
-    top: 0; /* Вверху страницы */
-    left: 0; /* Слева */
-    right: 0; /* Справа */
-    background-color: #282c34; /* Темный фон */
-    color: white; /* Белый текст */
-    padding: 10px; /* Отступы */
-    display: flex; /* Flexbox для выравнивания */
-    justify-content: space-between; /* Пространство между элементами */
-    align-items: center; /* Выравнивание по вертикали */
-    z-index: 1000; /* Установка z-index */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0; 
+    background-color: #282c34; 
+    color: white; 
+    padding: 10px; 
+    display: flex; 
+    justify-content: space-between;
+    align-items: center; 
+    z-index: 1000; 
 }
 
 /* Стили для блока с пользователем */
@@ -73,41 +73,41 @@ header {
 /* Стили для навигации */
 nav {
     display: flex;
-    gap: 15px; /* Отступы между элементами */
+    gap: 15px; 
 }
 
     /* Стили для ссылок */
     nav a {
-        color: white; /* Белый цвет текста */
-        text-decoration: none; /* Убираем подчеркивание */
-        padding: 8px 16px; /* Внутренние отступы */
-        border-radius: 4px; /* Скругляем углы */
-        transition: background-color 0.3s; /* Плавный переход цвета фона */
+        color: white; 
+        text-decoration: none; 
+        padding: 8px 16px;
+        border-radius: 4px; 
+        transition: background-color 0.3s; 
     }
 
         /* Эффект наведения на ссылки */
         nav a:hover {
-            background-color: rgba(255, 255, 255, 0.2); /* Прозрачный белый фон при наведении */
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
 /* Стили для основного контента */
 h1 {
-    margin: 20px 0; /* Отступы сверху и снизу */
+    margin: 20px 0; 
 }
 
 .book {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjust 250px as needed */
-    grid-gap: 20px; /* Adjust gap as needed */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-gap: 20px;
 }
 .book li {
     list-style: none;
-    border: 2px solid #000; /* Черная рамка */
-    border-radius: 10px; /* Закругленные углы */
-    padding: 20px; /* Внутренние отступы */
-    width: 140px; /* Ширина обертки */
+    border: 2px solid #000;
+    border-radius: 10px; 
+    padding: 20px;
+    width: 140px; 
     height: 200px;
-    background-color: #282c34; /* Цвет фона */
+    background-color: #282c34; 
     margin: 20px 0;
 }
 

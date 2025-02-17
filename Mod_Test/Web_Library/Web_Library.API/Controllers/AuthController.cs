@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Web_Library.API.Models;
 using Web_Library.API.Services;
 
@@ -102,7 +101,6 @@ namespace Web_Library.API.Controllers
             if (user == null)
                 return NotFound("User not found.");
 
-            // Return user information excluding sensitive data
             return Ok(new
             {
                 user.Id,
