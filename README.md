@@ -26,6 +26,9 @@ docker-compose up -d --build
 - **Backend (API):** http://localhost:8080/swagger
 - **Frontend (UI):** http://localhost:5005
 
+## Дополнительно
+Изменения находятся на ветке fix
+
 ## Дополнительные команды
 
 ### Остановка контейнеров
