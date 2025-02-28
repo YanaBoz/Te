@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
@@ -10,14 +8,15 @@ services:
     ports:
       - "1433:1433"
     healthcheck:
-      test: ["CMD", "sqlcmd", "-U", "sa", "-P", "Kolobok@12345", "-Q", "SELECT 1"]
+      test: ["CMD-SHELL", "sqlcmd -U sa -P Kolobok@12345 -Q 'SELECT 1'"]
       interval: 30s
       retries: 3
+      start_period: 30s
 
   web:
     build:
-      context: ./Web_Library.API
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Web_Library.API/Dockerfile
       args:
         BUILD_CONFIGURATION: Release
     ports:
@@ -30,9 +29,10 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/Books"]
       interval: 60s
       retries: 5
+      start_period: 30s
 
   ui:
     build:
@@ -46,6 +46,7 @@ services:
     environment:
       - API_BASE_URL=http://web:8080
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80"]
       interval: 30s
       retries: 3
+      start_period: 30s

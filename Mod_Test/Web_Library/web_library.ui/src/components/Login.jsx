@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import API_BASE_URL from '../config'; 
+import API_BASE_URL from '../config'; // Import the base URL
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -51,7 +51,7 @@ const Login = () => {
                 </button>
             </form>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            <p>Dont have an account? <a href="/register">Register here</a></p>
+            <p>Don't have an account? <a href="/register">Register here</a></p>
         </div>
     );
 };

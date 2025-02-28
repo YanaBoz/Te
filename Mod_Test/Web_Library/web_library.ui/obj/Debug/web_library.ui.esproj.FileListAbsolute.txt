@@ -1,0 +1,2 @@
+D:\Mod_Test\Web_Library\Web_Library.UI\obj\Debug\web_library.ui.esproj.CoreCompileInputs.cache
+D:\Rep\Te\Mod_Test\Web_Library\Web_Library.UI\obj\Debug\web_library.ui.esproj.CoreCompileInputs.cache

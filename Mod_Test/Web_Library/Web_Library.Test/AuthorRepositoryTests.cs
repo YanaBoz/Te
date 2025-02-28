@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Web_Library.API.Data;
-using Web_Library.API.Models;
-using Web_Library.API.Repositories.AuthorRepo;
+using Web_Library.Data;
+using Web_Library.Models;
+using Web_Library.Repositories;
 using Xunit;
 
 namespace Web_Library.Test
@@ -18,7 +18,7 @@ namespace Web_Library.Test
         public AuthorRepositoryTests()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) 
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
 
             _context = new AppDbContext(options);
@@ -30,8 +30,8 @@ namespace Web_Library.Test
         {
             var authors = new List<Author>
             {
-                new Author { Id = 1, FirstName = "John", LastName = "Doe", BirthDate = new DateTime(1980, 1, 1), Country = "USA" },
-                new Author { Id = 2, FirstName = "Jane", LastName = "Doe", BirthDate = new DateTime(1990, 1, 1), Country = "USA" }
+                new Author { Id = 1, FirstName = "John", LastName = "Doe" },
+                new Author { Id = 2, FirstName = "Jane", LastName = "Doe" }
             };
 
             await _context.Authors.AddRangeAsync(authors);
@@ -44,7 +44,7 @@ namespace Web_Library.Test
         [Fact]
         public async Task GetByIdAsync_ReturnsAuthor_WhenAuthorExists()
         {
-            var author = new Author { Id = 1, FirstName = "John", LastName = "Doe", BirthDate = new DateTime(1980, 1, 1), Country = "USA" };
+            var author = new Author { Id = 1, FirstName = "John", LastName = "Doe" };
             await _context.Authors.AddAsync(author);
             await _context.SaveChangesAsync();
 
@@ -56,7 +56,7 @@ namespace Web_Library.Test
         [Fact]
         public async Task AddAsync_AddsAuthor()
         {
-            var author = new Author { FirstName = "John", LastName = "Doe", BirthDate = new DateTime(1980, 1, 1), Country = "USA" };
+            var author = new Author { FirstName = "John", LastName = "Doe" };
 
             await _repository.AddAsync(author);
             var result = await _repository.GetAllAsync();
@@ -66,7 +66,7 @@ namespace Web_Library.Test
         [Fact]
         public async Task DeleteAsync_RemovesAuthor()
         {
-            var author = new Author { Id = 1, FirstName = "John", LastName = "Doe", BirthDate = new DateTime(1980, 1, 1), Country = "USA" };
+            var author = new Author { Id = 1, FirstName = "John", LastName = "Doe" };
             await _context.Authors.AddAsync(author);
             await _context.SaveChangesAsync();
 
@@ -78,7 +78,7 @@ namespace Web_Library.Test
         [Fact]
         public async Task GetBooksByAuthorIdAsync_ReturnsBooks_WhenBooksExist()
         {
-            var author = new Author { Id = 1, FirstName = "John", LastName = "Doe", BirthDate = new DateTime(1980, 1, 1), Country = "USA", Books = new List<Book>() };
+            var author = new Author { Id = 1, FirstName = "John", LastName = "Doe", Books = new List<Book>() };
             var book1 = new Book { Id = 1, Title = "Book 1", AuthorID = 1 };
             var book2 = new Book { Id = 2, Title = "Book 2", AuthorID = 1 };
 

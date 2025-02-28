@@ -1,0 +1,12 @@
+D:\Mod_Test\Web_Library\DTOs\bin\Release\net8.0\Web_Library.DTOs.deps.json
+D:\Mod_Test\Web_Library\DTOs\bin\Release\net8.0\Web_Library.DTOs.dll
+D:\Mod_Test\Web_Library\DTOs\bin\Release\net8.0\Web_Library.DTOs.pdb
+D:\Mod_Test\Web_Library\DTOs\obj\Release\net8.0\Web_Library.DTOs.csproj.AssemblyReference.cache
+D:\Mod_Test\Web_Library\DTOs\obj\Release\net8.0\Web_Library.DTOs.GeneratedMSBuildEditorConfig.editorconfig
+D:\Mod_Test\Web_Library\DTOs\obj\Release\net8.0\Web_Library.DTOs.AssemblyInfoInputs.cache
+D:\Mod_Test\Web_Library\DTOs\obj\Release\net8.0\Web_Library.DTOs.AssemblyInfo.cs
+D:\Mod_Test\Web_Library\DTOs\obj\Release\net8.0\Web_Library.DTOs.csproj.CoreCompileInputs.cache
+D:\Mod_Test\Web_Library\DTOs\obj\Release\net8.0\Web_Library.DTOs.dll
+D:\Mod_Test\Web_Library\DTOs\obj\Release\net8.0\refint\Web_Library.DTOs.dll
+D:\Mod_Test\Web_Library\DTOs\obj\Release\net8.0\Web_Library.DTOs.pdb
+D:\Mod_Test\Web_Library\DTOs\obj\Release\net8.0\ref\Web_Library.DTOs.dll

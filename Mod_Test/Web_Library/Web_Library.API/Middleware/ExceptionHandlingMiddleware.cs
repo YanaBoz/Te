@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Web_Library.Exceptions;
 
 namespace Web_Library.API.Middleware
 {
@@ -32,10 +33,41 @@ namespace Web_Library.API.Middleware
         {
             _logger.LogError(exception, exception.Message);
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var result = new { message = "An error occurred. Please try again later." };
+            context.Response.StatusCode = exception switch
+            {
+                NotFoundException => (int)HttpStatusCode.NotFound,
+                AlreadyExistsException => (int)HttpStatusCode.Conflict,
+                BadRequestException => (int)HttpStatusCode.BadRequest,
+                UnauthorizedException => (int)HttpStatusCode.Unauthorized,
+                _ => (int)HttpStatusCode.InternalServerError
+            };
+
+            var result = new { message = exception.Message };
             return context.Response.WriteAsJsonAsync(result);
         }
+    }
+}
+
+namespace Web_Library.Exceptions
+{
+    public class NotFoundException : Exception
+    {
+        public NotFoundException(string message) : base(message) { }
+    }
+
+    public class AlreadyExistsException : Exception
+    {
+        public AlreadyExistsException(string message) : base(message) { }
+    }
+
+    public class BadRequestException : Exception
+    {
+        public BadRequestException(string message) : base(message) { }
+    }
+
+    public class UnauthorizedException : Exception
+    {
+        public UnauthorizedException(string message) : base(message) { }
     }
 }

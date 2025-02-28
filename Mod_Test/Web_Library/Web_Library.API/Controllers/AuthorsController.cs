@@ -1,65 +1,64 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web_Library.API.Models;
-using Web_Library.API.Repositories.AuthorRepo;
-using Web_Library.API.Repositories.BookRepo;
+using Web_Library.DTOs;
+using Web_Library.Services;
 
 namespace Web_Library.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AuthorsController : ControllerBase
     {
-        private readonly IAuthorRepository _authorRepository;
-        private readonly IBookRepository _bookRepository;
-        public AuthorsController(IAuthorRepository authorRepository, IBookRepository bookRepository)
+        private readonly IAuthorService _authorService;
+
+        public AuthorsController(IAuthorService authorService)
         {
-            _bookRepository = bookRepository;
-            _authorRepository = authorRepository;
+            _authorService = authorService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Author>>> GetAuthors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAuthors()
         {
-            var (authors, totalCount) = await _authorRepository.GetPaginatedAuthorsAsync(pageNumber, pageSize);
-            return Ok(new { TotalCount = totalCount, Authors = authors });
+            var authors = await _authorService.GetAllAsync();
+            var authorDtos = authors.Adapt<IEnumerable<AuthorDto>>(); 
+            return Ok(authorDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Author>> GetAuthor(int id)
+        public async Task<IActionResult> GetAuthor(int id)
         {
-            var author = await _authorRepository.GetByIdAsync(id);
+            var author = await _authorService.GetByIdAsync(id);
             if (author == null) return NotFound();
-            return Ok(author);
+            return Ok(author.Adapt<AuthorDto>());
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Author>> CreateAuthor([FromBody] Author author)
+        public async Task<IActionResult> CreateAuthor([FromBody] AuthorDto authorDto)
         {
-            await _authorRepository.AddAsync(author);
-            return CreatedAtAction(nameof(GetAuthor), new { id = author.Id }, author);
+            await _authorService.AddAsync(authorDto);
+
+            return CreatedAtAction(nameof(GetAuthor), new { id = authorDto.Id }, authorDto);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateAuthor(int id, [FromBody] Author author)
+        public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorDto authorDto)
         {
-            if (id != author.Id) return BadRequest();
-            await _authorRepository.UpdateAsync(author);
+            if (id != authorDto.Id) return BadRequest();
+
+            await _authorService.UpdateAsync(authorDto);
+
             return NoContent();
         }
+
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
-            var author = await _authorRepository.GetByIdAsync(id);
-            if (author == null) return NotFound();
-
-            await _bookRepository.DeleteBooksByAuthorIdAsync(id);
-
-            await _authorRepository.DeleteAsync(id);
+            await _authorService.DeleteAsync(id);
             return NoContent();
         }
     }

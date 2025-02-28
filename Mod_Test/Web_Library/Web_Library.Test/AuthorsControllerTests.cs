@@ -1,56 +1,69 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using Web_Library.API.Controllers;
-using Web_Library.API.Models;
-using Web_Library.API.Repositories.AuthorRepo;
+using Web_Library.DTOs;
+using Web_Library.Models;
+using Web_Library.Services;
 using Xunit;
 
 namespace Web_Library.Test
 {
     public class AuthorsControllerTests : IDisposable
     {
-        private readonly Mock<IAuthorRepository> _mockAuthorRepository;
+        private readonly Mock<IAuthorService> _mockAuthorService;
         private readonly AuthorsController _controller;
 
         public AuthorsControllerTests()
         {
-            _mockAuthorRepository = new Mock<IAuthorRepository>();
-            _controller = new AuthorsController(_mockAuthorRepository.Object, null);
+            _mockAuthorService = new Mock<IAuthorService>();
+            _controller = new AuthorsController(_mockAuthorService.Object);
         }
 
         [Fact]
         public async Task GetAuthor_ReturnsNotFound_WhenAuthorDoesNotExist()
         {
-            _mockAuthorRepository.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((Author)null);
+            _mockAuthorService.Setup(service => service.GetByIdAsync(1)).ReturnsAsync((AuthorDto)null);
+
             var result = await _controller.GetAuthor(1);
-            Assert.IsType<NotFoundResult>(result.Result);
+            Assert.IsType<NotFoundResult>(result);
         }
 
         [Fact]
         public async Task CreateAuthor_ReturnsCreatedResult_WhenAuthorIsValid()
         {
-            var author = new Author { FirstName = "John", LastName = "Doe", BirthDate = new DateTime(1980, 1, 1), Country = "USA" };
-            _mockAuthorRepository.Setup(repo => repo.AddAsync(author)).Returns(Task.CompletedTask);
-            _mockAuthorRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<int>())).ReturnsAsync(author);
+            var authorDto = new AuthorDto { FirstName = "John", LastName = "Doe" };
+            _mockAuthorService.Setup(service => service.AddAsync(authorDto)).Returns(Task.CompletedTask);
+            _mockAuthorService.Setup(service => service.GetByIdAsync(It.IsAny<int>())).ReturnsAsync(authorDto);
 
-            var result = await _controller.CreateAuthor(author);
-            var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
-            Assert.Equal(author, createdResult.Value);
+            var result = await _controller.CreateAuthor(authorDto);
+            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
+            Assert.Equal(authorDto, createdAtActionResult.Value);
         }
 
         [Fact]
         public async Task UpdateAuthor_ReturnsNoContent_WhenAuthorIsUpdated()
         {
-            var author = new Author { Id = 1, FirstName = "John", LastName = "Doe", BirthDate = new DateTime(1980, 1, 1), Country = "USA" };
-            _mockAuthorRepository.Setup(repo => repo.UpdateAsync(author)).Returns(Task.CompletedTask);
+            var authorDto = new AuthorDto { Id = 1, FirstName = "John", LastName = "Doe" };
+            _mockAuthorService.Setup(service => service.UpdateAsync(authorDto)).Returns(Task.CompletedTask);
 
-            var result = await _controller.UpdateAuthor(1, author);
+            var result = await _controller.UpdateAuthor(1, authorDto);
+            Assert.IsType<NoContentResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteAuthor_ReturnsNoContent_WhenAuthorIsDeleted()
+        {
+            _mockAuthorService.Setup(service => service.DeleteAsync(1)).Returns(Task.CompletedTask);
+
+            var result = await _controller.DeleteAuthor(1);
             Assert.IsType<NoContentResult>(result);
         }
 
         public void Dispose()
         {
+
         }
     }
 }
