@@ -12,54 +12,97 @@ namespace Web_Library.API.Controllers
     {
         private readonly IAuthorService _authorService;
 
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
+
         public AuthorsController(IAuthorService authorService)
         {
             _authorService = authorService;
         }
+        private CancellationToken GetCancellationToken(CancellationToken cancellationToken)
+        {
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(_timeout);
+            return cts.Token;
+        }
 
         [HttpGet]
-        public async Task<IActionResult> GetAuthors()
+        public async Task<IActionResult> GetAuthors(CancellationToken cancellationToken)
         {
-            var authors = await _authorService.GetAllAsync();
-            var authorDtos = authors.Adapt<IEnumerable<AuthorDto>>(); 
-            return Ok(authorDtos);
+            try
+            {
+                var authors = await _authorService.GetAllAsync(GetCancellationToken(cancellationToken));
+                var authorDtos = authors.Adapt<IEnumerable<AuthorDto>>();
+                return Ok(authorDtos);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAuthor(int id)
+        public async Task<IActionResult> GetAuthor(int id, CancellationToken cancellationToken)
         {
-            var author = await _authorService.GetByIdAsync(id);
-            if (author == null) return NotFound();
-            return Ok(author.Adapt<AuthorDto>());
+            try
+            {
+                var author = await _authorService.GetByIdAsync(id, GetCancellationToken(cancellationToken));
+                if (author == null) return NotFound();
+                return Ok(author.Adapt<AuthorDto>());
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateAuthor([FromBody] AuthorDto authorDto)
+        public async Task<IActionResult> CreateAuthor([FromBody] AuthorDto authorDto, CancellationToken cancellationToken)
         {
-            await _authorService.AddAsync(authorDto);
+            try
+            {
+                await _authorService.AddAsync(authorDto, GetCancellationToken(cancellationToken));
 
-            return CreatedAtAction(nameof(GetAuthor), new { id = authorDto.Id }, authorDto);
+                return CreatedAtAction(nameof(GetAuthor), new { id = authorDto.Id }, authorDto);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorDto authorDto)
+        public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorDto authorDto, CancellationToken cancellationToken)
         {
-            if (id != authorDto.Id) return BadRequest();
+            try
+            {
+                if (id != authorDto.Id) return BadRequest();
 
-            await _authorService.UpdateAsync(authorDto);
+                await _authorService.UpdateAsync(authorDto, GetCancellationToken(cancellationToken));
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteAuthor(int id)
+        public async Task<IActionResult> DeleteAuthor(int id, CancellationToken cancellationToken)
         {
-            await _authorService.DeleteAsync(id);
-            return NoContent();
+            try
+            {
+                await _authorService.DeleteAsync(id, GetCancellationToken(cancellationToken));
+                return NoContent();
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
     }
 }

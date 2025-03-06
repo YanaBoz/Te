@@ -30,23 +30,29 @@ const BookDetail = () => {
         }
     };
 
-    const fetchUserRole = async () => {
+    const fetchUserRole = async (cancelToken) => {
         if (!token) return;
         try {
             const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
+                cancelToken
             });
             setIsAdmin(response.data.role === 'Admin');
         } catch (error) {
-            console.error('Error fetching user role:', error);
-            setError('Error fetching user role');
+            if (axios.isCancel(error)) {
+                console.log('Request canceled:', error.message);
+            } else {
+                console.error('Error fetching user role:', error);
+                setError('Error fetching user role');
+            }
         }
     };
 
-    const fetchBook = async () => {
+    const fetchBook = async (cancelToken) => {
         try {
             const response = await axios.get(`${API_BASE_URL}/books/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
+                cancelToken
             });
             setBook(response.data);
         } catch (error) {
@@ -77,22 +83,6 @@ const BookDetail = () => {
             setBook(response.data);
         } catch (error) {
             setError('Error fetching book data with new token');
-        }
-    };
-
-    const handleBorrow = async () => {
-        if (book.quantity > 0) {
-            try {
-                await axios.post(`${API_BASE_URL}/books/issue/${id}`, {}, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                alert('You have successfully borrowed the book!');
-                fetchBook(); // Refresh book info after borrowing
-            } catch (error) {
-                setError('Error borrowing the book');
-            }
-        } else {
-            alert('This book is not available for borrowing.');
         }
     };
 
@@ -137,8 +127,14 @@ const BookDetail = () => {
     };
 
     useEffect(() => {
-        fetchUserRole(); // Fetch user role
-        fetchBook(); // Fetch book details
+        const cancelSource = axios.CancelToken.source();
+
+        fetchUserRole(cancelSource.token);
+        fetchBook(cancelSource.token);
+
+        return () => {
+            cancelSource.cancel('Operation canceled by user.');
+        };
     }, [id, token]);
 
     if (loading) return <p>Loading...</p>;

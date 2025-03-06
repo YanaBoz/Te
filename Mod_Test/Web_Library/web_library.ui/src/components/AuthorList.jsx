@@ -1,50 +1,72 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import API_BASE_URL from '../config'; // Импортируйте базовый URL
+import API_BASE_URL from '../config';
 
 const AuthorList = () => {
     const [authors, setAuthors] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
     const [pageNumber, setPageNumber] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [isAdmin, setIsAdmin] = useState(false); // State to track if the user is an admin
+    const [error, setError] = useState('');
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const getCurrentUser = () => JSON.parse(localStorage.getItem('currentUser'));
     const currentUser = getCurrentUser();
     const token = currentUser ? currentUser.accessToken : '';
 
-    const fetchUserRole = async () => {
+    const fetchUserRole = async (cancelToken) => {
         if (!token) return;
         try {
             const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
+                cancelToken
             });
-            setIsAdmin(response.data.role === 'Admin'); // Set admin status
+            setIsAdmin(response.data.role === 'Admin');
         } catch (error) {
-            console.error('Error fetching user role:', error);
+            if (axios.isCancel(error)) {
+                console.log('Request canceled:', error.message);
+            } else {
+                console.error('Error fetching user role:', error);
+                setError('Error fetching user role.');
+            }
         }
     };
 
-    const fetchAuthors = async () => {
+    const fetchAuthors = async (cancelToken) => {
         setLoading(true);
         try {
             const response = await axios.get(`${API_BASE_URL}/authors`, {
+                headers: { Authorization: `Bearer ${token}` },
                 params: { pageNumber, pageSize: 10 },
+                cancelToken
             });
             setAuthors(response.data.authors);
             setTotalCount(response.data.totalCount);
         } catch (error) {
-            console.error('Error fetching authors:', error);
+            if (axios.isCancel(error)) {
+                console.log('Request canceled:', error.message);
+            } else {
+                console.error('Error fetching authors:', error);
+                setError('Error fetching authors.');
+            }
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchUserRole(); // Fetch user role to determine if admin
-        fetchAuthors(); // Fetch authors
+        const cancelSource = axios.CancelToken.source();
+
+        fetchUserRole(cancelSource.token);
+        fetchAuthors(cancelSource.token);
+
+        return () => {
+            cancelSource.cancel('Operation canceled by user.');
+        };
     }, [pageNumber, token]);
+
+    if (error) return <div className="error">{error}</div>;
 
     return (
         <div className="body">

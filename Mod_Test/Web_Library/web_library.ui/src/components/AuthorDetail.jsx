@@ -15,27 +15,37 @@ const AuthorDetail = () => {
     const currentUser = getCurrentUser();
     const token = currentUser ? currentUser.accessToken : '';
 
-    const fetchUserRole = async () => {
+    const fetchUserRole = async (cancelToken) => {
         if (!token) return;
         try {
             const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
+                cancelToken
             });
             setIsAdmin(response.data.role === 'Admin');
         } catch (error) {
-            console.error('Error fetching user role:', error);
-            setError('Error fetching user role');
+            if (axios.isCancel(error)) {
+                console.log('Request canceled:', error.message);
+            } else {
+                console.error('Error fetching user role:', error);
+                setError('Error fetching user role');
+            }
         }
     };
 
-    const fetchAuthor = async () => {
+    const fetchAuthor = async (cancelToken) => {
         try {
             const response = await axios.get(`${API_BASE_URL}/authors/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
+                cancelToken
             });
             setAuthor(response.data);
         } catch (error) {
-            setError('Error fetching author data: ' + (error.response?.data?.message || error.message));
+            if (axios.isCancel(error)) {
+                console.log('Request canceled:', error.message);
+            } else {
+                setError('Error fetching author data: ' + (error.response?.data?.message || error.message));
+            }
         } finally {
             setLoading(false);
         }
@@ -56,8 +66,14 @@ const AuthorDetail = () => {
     };
 
     useEffect(() => {
-        fetchUserRole();
-        fetchAuthor();
+        const cancelSource = axios.CancelToken.source();
+
+        fetchUserRole(cancelSource.token);
+        fetchAuthor(cancelSource.token);
+
+        return () => {
+            cancelSource.cancel('Operation canceled by user.');
+        };
     }, [id, token]);
 
     if (loading) return <p>Loading...</p>;

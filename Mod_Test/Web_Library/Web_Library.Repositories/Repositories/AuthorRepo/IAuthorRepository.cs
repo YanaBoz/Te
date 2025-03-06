@@ -4,13 +4,13 @@ namespace Web_Library.Repositories
 {
     public interface IAuthorRepository
     {
-        Task<IEnumerable<Author>> GetAllAsync();
-        Task<(IEnumerable<Author> Authors, int TotalCount)> GetPaginatedAuthorsAsync(int pageNumber, int pageSize);
-        Task<Author?> GetByIdAsync(int id);
-        Task AddAsync(Author author);
-        Task UpdateAsync(Author author);
-        Task DeleteAsync(int id);
-        Task<int> GetIdByNameAsync(string firstName, string lastName);
-        Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorId);
+        Task<IEnumerable<Author>> GetAllAsync(CancellationToken cancellationToken);
+        Task<(IEnumerable<Author> Authors, int TotalCount)> GetPaginatedAuthorsAsync(int pageNumber, int pageSize, CancellationToken cancellationToken);
+        Task<Author?> GetByIdAsync(int id, CancellationToken cancellationToken);
+        Task AddAsync(Author author, CancellationToken cancellationToken);
+        Task UpdateAsync(Author author, CancellationToken cancellationToken);
+        Task DeleteAsync(int id, CancellationToken cancellationToken);
+        Task<int> GetIdByNameAsync(string firstName, string lastName, CancellationToken cancellationToken);
+        Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorId, CancellationToken cancellationToken);
     }
 }

@@ -1,12 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Web_Library.Data;
 using Web_Library.Models;
 using Web_Library.Repositories;
-using Xunit;
 
 namespace Web_Library.Test
 {
@@ -37,7 +32,7 @@ namespace Web_Library.Test
             await _context.Authors.AddRangeAsync(authors);
             await _context.SaveChangesAsync();
 
-            var result = await _repository.GetAllAsync();
+            var result = await _repository.GetAllAsync(CancellationToken.None);
             Assert.Equal(2, result.Count());
         }
 
@@ -48,9 +43,16 @@ namespace Web_Library.Test
             await _context.Authors.AddAsync(author);
             await _context.SaveChangesAsync();
 
-            var result = await _repository.GetByIdAsync(1);
+            var result = await _repository.GetByIdAsync(1, CancellationToken.None);
             Assert.NotNull(result);
-            Assert.Equal("John", result.FirstName);
+            Assert.Equal("John", result?.FirstName);
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_ReturnsNull_WhenAuthorDoesNotExist()
+        {
+            var result = await _repository.GetByIdAsync(999, CancellationToken.None);
+            Assert.Null(result);
         }
 
         [Fact]
@@ -58,9 +60,10 @@ namespace Web_Library.Test
         {
             var author = new Author { FirstName = "John", LastName = "Doe" };
 
-            await _repository.AddAsync(author);
-            var result = await _repository.GetAllAsync();
+            await _repository.AddAsync(author, CancellationToken.None);
+            var result = await _repository.GetAllAsync(CancellationToken.None);
             Assert.Single(result);
+            Assert.Equal("John", result.First().FirstName);
         }
 
         [Fact]
@@ -70,8 +73,8 @@ namespace Web_Library.Test
             await _context.Authors.AddAsync(author);
             await _context.SaveChangesAsync();
 
-            await _repository.DeleteAsync(1);
-            var result = await _repository.GetAllAsync();
+            await _repository.DeleteAsync(1, CancellationToken.None);
+            var result = await _repository.GetAllAsync(CancellationToken.None);
             Assert.Empty(result);
         }
 
@@ -86,7 +89,7 @@ namespace Web_Library.Test
             await _context.Books.AddRangeAsync(book1, book2);
             await _context.SaveChangesAsync();
 
-            var result = await _repository.GetBooksByAuthorIdAsync(1);
+            var result = await _repository.GetBooksByAuthorIdAsync(1, CancellationToken.None);
             Assert.Equal(2, result.Count());
         }
 

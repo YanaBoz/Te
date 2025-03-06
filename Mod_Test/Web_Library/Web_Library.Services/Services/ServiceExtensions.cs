@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Web_Library.Repositories;
+using Web_Library.Repositories.Repositories.NotiRepo;
+using Web_Library.Services.Notification;
+using Web_Library.Services.Services.Password;
 
 namespace Web_Library.Services
 {
@@ -42,6 +45,11 @@ namespace Web_Library.Services
 
             services.AddScoped<IBookService, BookService>();
             services.AddScoped<IAuthorService, AuthorService>();
+
+            services.AddScoped<IPasswordService, PasswordService>();
+
+            services.AddScoped<NotificationRepository>();
+            services.AddScoped<INotificationService, NotificationService>();
         }
     }
 }

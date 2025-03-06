@@ -12,24 +12,24 @@ namespace Web_Library.Repositories
             _context = context;
         }
 
-        public async Task<Genre?> GetByIdAsync(int id)
+        public async Task<Genre?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await _context.Genres.FindAsync(id);
+            return await _context.Genres.FindAsync(new object[] { id }, cancellationToken);
         }
 
-        public async Task<bool> ExistsAsync(int id)
+        public async Task<bool> ExistsAsync(int id, CancellationToken cancellationToken)
         {
-            return await _context.Genres.AnyAsync(g => g.Id == id);
+            return await _context.Genres.AnyAsync(g => g.Id == id, cancellationToken);
         }
 
-        public async Task<List<Genre>> GetAllAsync()
+        public async Task<List<Genre>> GetAllAsync(CancellationToken cancellationToken)
         {
             return await _context.Genres.ToListAsync();
         }
 
-        public async Task<int> GetIdByNameAsync(string name)
+        public async Task<int> GetIdByNameAsync(string name, CancellationToken cancellationToken)
         {
-            var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Name == name);
+            var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Name == name, cancellationToken);
             return genre?.Id ?? 0;
         }
     }

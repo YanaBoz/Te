@@ -14,6 +14,9 @@ namespace Web_Library.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(13);
 
+            builder.HasIndex(b => b.ISBN)
+           .IsUnique();
+
             builder.Property(b => b.Title)
                 .IsRequired()
                 .HasMaxLength(200);
@@ -33,7 +36,8 @@ namespace Web_Library.Data.Configurations
 
             builder.HasOne<Genre>()
                 .WithMany()
-                .HasForeignKey(b => b.GenreID);
+                .HasForeignKey(b => b.GenreID)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System.Net;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using Web_Library.Exceptions;
+using Web_Library.API.Exceptions;
 
 namespace Web_Library.API.Middleware
 {
@@ -40,34 +37,12 @@ namespace Web_Library.API.Middleware
                 AlreadyExistsException => (int)HttpStatusCode.Conflict,
                 BadRequestException => (int)HttpStatusCode.BadRequest,
                 UnauthorizedException => (int)HttpStatusCode.Unauthorized,
+                TimeoutException => (int)HttpStatusCode.RequestTimeout,
                 _ => (int)HttpStatusCode.InternalServerError
             };
 
             var result = new { message = exception.Message };
             return context.Response.WriteAsJsonAsync(result);
         }
-    }
-}
-
-namespace Web_Library.Exceptions
-{
-    public class NotFoundException : Exception
-    {
-        public NotFoundException(string message) : base(message) { }
-    }
-
-    public class AlreadyExistsException : Exception
-    {
-        public AlreadyExistsException(string message) : base(message) { }
-    }
-
-    public class BadRequestException : Exception
-    {
-        public BadRequestException(string message) : base(message) { }
-    }
-
-    public class UnauthorizedException : Exception
-    {
-        public UnauthorizedException(string message) : base(message) { }
     }
 }

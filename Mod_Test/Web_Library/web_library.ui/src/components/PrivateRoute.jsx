@@ -1,11 +1,13 @@
 import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import API_BASE_URL from '../config'; // Импортируйте базовый URL
+import API_BASE_URL from '../config';
 
 const PrivateRoute = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const source = axios.CancelToken.source();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -16,8 +18,9 @@ const PrivateRoute = ({ children }) => {
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (refreshToken) {
                     try {
-                        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
+                        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken }, { cancelToken: source.token });
                         const { accessToken } = response.data;
+
                         localStorage.setItem('currentUser', JSON.stringify({
                             ...currentUser,
                             accessToken
@@ -33,10 +36,13 @@ const PrivateRoute = ({ children }) => {
         };
 
         checkAuth();
+        return () => {
+            source.cancel('PrivateRoute component unmounted, canceling request');
+        };
     }, []);
 
     if (isLoading) {
-        return <div>Loading...</div>; // Индикатор загрузки
+        return <div>Loading...</div>;
     }
 
     return isAuthenticated ? children : <Navigate to="/login" />;

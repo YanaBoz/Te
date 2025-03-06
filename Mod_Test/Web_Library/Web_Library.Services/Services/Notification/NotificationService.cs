@@ -1,30 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Web_Library.Data;
-using Web_Library.Repositories;
+﻿using Web_Library.Models;
+using Web_Library.Repositories.Repositories.NotiRepo;
 
 namespace Web_Library.Services.Notification
 {
-    public class NotificationService
+    public class NotificationService : INotificationService
     {
-        private readonly AppDbContext _context;
+        private readonly NotificationRepository _notificationRepository;
 
-        public NotificationService(AppDbContext context)
+        public NotificationService(NotificationRepository notificationRepository)
         {
-            _context = context;
+            _notificationRepository = notificationRepository;
         }
 
-        public async Task SendOverdueNotifications()
+        public async Task<bool> UserHasOverdueBooksAsync(string userId, CancellationToken cancellationToken)
         {
-            var overdueBooks = await _context.Books
-                .Where(b => b.ReturnBy < DateTime.Now && !b.IsNotified)
-                .ToListAsync();
-
-            foreach (var book in overdueBooks)
-            {
-                book.IsNotified = true; 
-            }
-
-            await _context.SaveChangesAsync();
+            var overdueBooks = await _notificationRepository.GetOverdueBooksAsync(userId, cancellationToken);
+            return overdueBooks.Any();
         }
     }
 }

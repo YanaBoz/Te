@@ -12,73 +12,45 @@ namespace Web_Library.Repositories
             _context = context;
         }
 
-        public async Task<User?> GetByUsernameAsync(string username)
+        public async Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
         }
 
-        public async Task<User?> GetByIdAsync(string userId)
+        public async Task<User?> GetByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            return await _context.Users.FindAsync(userId);
+            return await _context.Users.FindAsync(new object[] { userId }, cancellationToken);
         }
 
-        public async Task AddAsync(User user)
+        public async Task AddAsync(User user, CancellationToken cancellationToken)
         {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            await _context.Users.AddAsync(user, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task UpdateAsync(User user)
+        public async Task UpdateAsync(User user, CancellationToken cancellationToken)
         {
             _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteAsync(string userId)
+        public async Task DeleteAsync(string userId, CancellationToken cancellationToken)
         {
-            var user = await GetByIdAsync(userId);
+            var user = await GetByIdAsync(userId, cancellationToken);
             if (user != null)
             {
                 _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
             }
         }
 
-        public async Task<List<Book>> GetBorrowedBooksAsync(string userId)
+        public async Task<List<Book>> GetBorrowedBooksAsync(string userId, CancellationToken cancellationToken)
         {
             var user = await _context.Users
                 .Include(u => u.BorrowedBooks)
-                .FirstOrDefaultAsync(u => u.Id == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
             return user?.BorrowedBooks.ToList() ?? new List<Book>();
-        }
-
-        public async Task<User?> AuthenticateAsync(string username, string password)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (user != null && VerifyPassword(password, user.PasswordHash))
-                return user;
-            return null;
-        }
-
-        public async Task<bool> RegisterAsync(User user, string password)
-        {
-            bool exists = await _context.Users.AnyAsync(u => u.Username == user.Username);
-            if (exists) return false;
-            user.PasswordHash = HashPassword(password);
-            await _context.Users.AddAsync(user);
-            return await _context.SaveChangesAsync() > 0;
-        }
-
-        private string HashPassword(string password)
-        {
-            using var sha256 = System.Security.Cryptography.SHA256.Create();
-            var bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
-        }
-
-        private bool VerifyPassword(string password, string storedHash)
-        {
-            return HashPassword(password) == storedHash;
         }
     }
 }
+

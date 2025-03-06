@@ -5,21 +5,23 @@ import API_BASE_URL from '../config';
 const MyBooks = () => {
     const [myBooks, setMyBooks] = useState([]);
     const [overdueBooks, setOverdueBooks] = useState([]);
-    const [allOverdueBooks, setAllOverdueBooks] = useState([]); // To store all overdue books
+    const [allOverdueBooks, setAllOverdueBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [isAdmin, setIsAdmin] = useState(false); // State to check if the user is an admin
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const getCurrentUser = () => JSON.parse(localStorage.getItem('currentUser'));
     const currentUser = getCurrentUser();
     const token = currentUser ? currentUser.accessToken : '';
+
+    const source = axios.CancelToken.source();
 
     const refreshAccessToken = async () => {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) return null;
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
+            const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken }, { cancelToken: source.token });
             const { accessToken } = response.data;
             localStorage.setItem('currentUser', JSON.stringify({ ...currentUser, accessToken }));
             return accessToken;
@@ -32,7 +34,8 @@ const MyBooks = () => {
     const fetchBooks = async (endpoint, setter) => {
         try {
             const response = await axios.get(endpoint, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
+                cancelToken: source.token
             });
             setter(response.data);
         } catch (error) {
@@ -41,7 +44,8 @@ const MyBooks = () => {
                 const newToken = await refreshAccessToken();
                 if (newToken) {
                     const response = await axios.get(endpoint, {
-                        headers: { Authorization: `Bearer ${newToken}` }
+                        headers: { Authorization: `Bearer ${newToken}` },
+                        cancelToken: source.token
                     });
                     setter(response.data);
                 } else {
@@ -53,12 +57,12 @@ const MyBooks = () => {
         }
     };
 
-    // Fetch user role to determine if user is an admin
     const fetchUserRole = async () => {
         if (!token) return;
         try {
             const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
+                cancelToken: source.token
             });
             setIsAdmin(response.data.role === 'Admin');
         } catch (error) {
@@ -67,16 +71,15 @@ const MyBooks = () => {
         }
     };
 
-    // Fetch all overdue books and handle 404 gracefully
     const fetchAllOverdueBooks = async () => {
         try {
-            const response = await axios.get('https://localhost:32821/api/Books/overdue', {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await axios.get(`${API_BASE_URL}/books/overdue`, {
+                headers: { Authorization: `Bearer ${token}` },
+                cancelToken: source.token
             });
-            setAllOverdueBooks(response.data); // Assuming you're using this state to store overdue books
+            setAllOverdueBooks(response.data);
         } catch (error) {
             if (error.response?.status === 404) {
-                // If no overdue books, just inform the user.
                 setAllOverdueBooks([]);
                 setError('No overdue books available.');
             } else {
@@ -85,22 +88,26 @@ const MyBooks = () => {
         }
     };
 
-
     useEffect(() => {
-        fetchUserRole(); // Fetch user role to check if admin
         const loadBooks = async () => {
+            setLoading(true);
             try {
                 await Promise.all([
                     fetchBooks(`${API_BASE_URL}/auth/borrowed-books`, setMyBooks),
-                    fetchBooks(`${API_BASE_URL}/books/user-overdue`, setOverdueBooks)
+                    fetchBooks(`${API_BASE_URL}/books/user-overdue`, setOverdueBooks),
                 ]);
+                fetchUserRole();
             } catch (error) {
                 setError('Failed to load books');
             } finally {
                 setLoading(false);
             }
         };
+
         loadBooks();
+        return () => {
+            source.cancel('Component unmounted, canceling requests');
+        };
     }, [token]);
 
     if (loading) {
@@ -144,7 +151,6 @@ const MyBooks = () => {
                 )}
             </ul>
 
-            {/* If the user is an admin, show the button to fetch all overdue books */}
             {isAdmin && (
                 <div>
                     <button onClick={fetchAllOverdueBooks}>Show All Overdue Books</button>

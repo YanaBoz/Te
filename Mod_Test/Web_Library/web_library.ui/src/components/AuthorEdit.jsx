@@ -28,30 +28,40 @@ const AuthorEdit = () => {
         }
     };
 
+    const fetchAuthor = async (currentToken, cancelToken) => {
+        if (!id) {
+            setLoading(false);
+            return;
+        }
+        try {
+            const response = await axios.get(`${API_BASE_URL}/authors/${id}`, {
+                headers: { Authorization: `Bearer ${currentToken}` },
+                cancelToken
+            });
+            setAuthor(response.data);
+        } catch (error) {
+            if (axios.isCancel(error)) {
+                console.log('Request canceled:', error.message);
+            } else if (error.response?.status === 401) {
+                const newToken = await refreshAccessToken();
+                if (newToken) fetchAuthor(newToken, cancelToken);
+                else setError('Session expired. Please log in again.');
+            } else {
+                setError('Error fetching author data.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchAuthor = async (currentToken) => {
-            if (!id) {
-                setLoading(false);
-                return;
-            }
-            try {
-                const response = await axios.get(`${API_BASE_URL}/authors/${id}`, {
-                    headers: { Authorization: `Bearer ${currentToken}` },
-                });
-                setAuthor(response.data);
-            } catch (error) {
-                if (error.response?.status === 401) {
-                    const newToken = await refreshAccessToken();
-                    if (newToken) fetchAuthor(newToken);
-                    else setError('Session expired. Please log in again.');
-                } else {
-                    setError('Error fetching author data.');
-                }
-            } finally {
-                setLoading(false);
-            }
+        const cancelSource = axios.CancelToken.source();
+
+        fetchAuthor(token, cancelSource.token);
+
+        return () => {
+            cancelSource.cancel('Operation canceled by user.');
         };
-        fetchAuthor(token);
     }, [id, token]);
 
     const handleSubmit = async (e) => {
@@ -82,10 +92,33 @@ const AuthorEdit = () => {
         <div>
             <h2>{id ? 'Edit Author' : 'Add Author'}</h2>
             <form onSubmit={handleSubmit}>
-                <input type="text" placeholder="First Name" value={author.firstName} onChange={(e) => setAuthor({ ...author, firstName: e.target.value })} required />
-                <input type="text" placeholder="Last Name" value={author.lastName} onChange={(e) => setAuthor({ ...author, lastName: e.target.value })} required />
-                <input type="date" value={author.birthDate} onChange={(e) => setAuthor({ ...author, birthDate: e.target.value })} required />
-                <input type="text" placeholder="Country" value={author.country} onChange={(e) => setAuthor({ ...author, country: e.target.value })} required />
+                <input
+                    type="text"
+                    placeholder="First Name"
+                    value={author.firstName}
+                    onChange={(e) => setAuthor({ ...author, firstName: e.target.value })}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Last Name"
+                    value={author.lastName}
+                    onChange={(e) => setAuthor({ ...author, lastName: e.target.value })}
+                    required
+                />
+                <input
+                    type="date"
+                    value={author.birthDate}
+                    onChange={(e) => setAuthor({ ...author, birthDate: e.target.value })}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Country"
+                    value={author.country}
+                    onChange={(e) => setAuthor({ ...author, country: e.target.value })}
+                    required
+                />
                 <button type="submit">{id ? 'Update' : 'Add'}</button>
             </form>
             {error && <p className="error">{error}</p>}

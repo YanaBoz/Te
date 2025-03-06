@@ -11,7 +11,7 @@ const BookEdit = () => {
     const [quantity, setQuantity] = useState(0);
     const [authorId, setAuthorId] = useState('');
     const [imageUrl, setImageUrl] = useState('');
-    const [genres, setGenres] = useState([]);  // Список жанров
+    const [genres, setGenres] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -22,15 +22,22 @@ const BookEdit = () => {
     const token = currentUser ? currentUser.accessToken : '';
 
     useEffect(() => {
+        const cancelSource = axios.CancelToken.source();
+
         const fetchGenres = async () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}/books/genres`, {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` },
+                    cancelToken: cancelSource.token,
                 });
                 setGenres(response.data);
             } catch (err) {
-                console.error("Ошибка загрузки жанров", err);
-                setError("Ошибка загрузки жанров.");
+                if (axios.isCancel(err)) {
+                    console.log('Request canceled:', err.message);
+                } else {
+                    console.error("Error loading genres", err);
+                    setError("Error loading genres.");
+                }
             }
         };
 
@@ -38,18 +45,23 @@ const BookEdit = () => {
             if (id) {
                 try {
                     const response = await axios.get(`${API_BASE_URL}/books/${id}`, {
-                        headers: { Authorization: `Bearer ${token}` }
+                        headers: { Authorization: `Bearer ${token}` },
+                        cancelToken: cancelSource.token,
                     });
                     const book = response.data;
                     setIsbn(book.isbn);
                     setTitle(book.title);
-                    setGenre(book.genreID);  // Используем ID жанра
+                    setGenre(book.genreID);
                     setDescription(book.description);
                     setQuantity(book.quantity);
                     setAuthorId(book.authorID);
                     setImageUrl(book.imageUrl || '');
                 } catch (err) {
-                    setError("Ошибка загрузки книги.");
+                    if (axios.isCancel(err)) {
+                        console.log('Request canceled:', err.message);
+                    } else {
+                        setError("Error loading book.");
+                    }
                 } finally {
                     setLoading(false);
                 }
@@ -60,11 +72,20 @@ const BookEdit = () => {
 
         fetchGenres();
         fetchBook();
+
+        return () => {
+            cancelSource.cancel('Operation canceled by user.');
+        };
     }, [id, token]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (!isbn || !title || !genre || !authorId || !quantity) {
+            setError("Please fill in all required fields.");
+            return;
+        }
 
         const book = { isbn, title, genreID: genre, description, quantity, authorId, imageUrl };
 
@@ -80,24 +101,36 @@ const BookEdit = () => {
             }
             navigate('/books');
         } catch (err) {
-            setError("Ошибка сохранения книги.");
+            setError("Error saving book.");
+            console.error(err);
         }
     };
 
     if (loading) {
-        return <p>Загрузка...</p>;
+        return <p>Loading...</p>;
     }
 
     return (
         <div>
-            <h2>{id ? 'Редактировать книгу' : 'Добавить книгу'}</h2>
+            <h2>{id ? 'Edit Book' : 'Add Book'}</h2>
             <form onSubmit={handleSubmit}>
-                <input type="text" placeholder="ISBN" value={isbn} onChange={(e) => setIsbn(e.target.value)} required />
-                <input type="text" placeholder="Название" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                <input
+                    type="text"
+                    placeholder="ISBN"
+                    value={isbn}
+                    onChange={(e) => setIsbn(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                />
 
-                {/* Выпадающий список жанров */}
                 <select value={genre} onChange={(e) => setGenre(e.target.value)} required>
-                    <option value="">Выберите жанр</option>
+                    <option value="">Select Genre</option>
                     {genres.map((g) => (
                         <option key={g.id} value={g.id}>
                             {g.name}
@@ -105,11 +138,32 @@ const BookEdit = () => {
                     ))}
                 </select>
 
-                <textarea placeholder="Описание" value={description} onChange={(e) => setDescription(e.target.value)} />
-                <input type="number" placeholder="Количество" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
-                <input type="text" placeholder="ID Автора" value={authorId} onChange={(e) => setAuthorId(e.target.value)} required />
-                <input type="text" placeholder="URL изображения" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-                <button type="submit">{id ? 'Обновить' : 'Добавить'}</button>
+                <textarea
+                    placeholder="Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                />
+                <input
+                    type="number"
+                    placeholder="Quantity"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Author ID"
+                    value={authorId}
+                    onChange={(e) => setAuthorId(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Image URL"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                />
+                <button type="submit">{id ? 'Update' : 'Add'}</button>
             </form>
             {error && <p className="error">{error}</p>}
         </div>

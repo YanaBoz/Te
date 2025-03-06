@@ -14,39 +14,39 @@ namespace Web_Library.Services
             _authorRepository = authorRepository;
         }
 
-        public async Task<IEnumerable<AuthorDto>> GetAllAsync()
+        public async Task<IEnumerable<AuthorDto>> GetAllAsync(CancellationToken cancellationToken)
         {
-            var authors = await _authorRepository.GetAllAsync();
+            var authors = await _authorRepository.GetAllAsync(cancellationToken);
             return authors.Adapt<IEnumerable<AuthorDto>>();
         }
 
-        public async Task<AuthorDto?> GetByIdAsync(int id)
+        public async Task<AuthorDto?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var author = await _authorRepository.GetByIdAsync(id);
+            var author = await _authorRepository.GetByIdAsync(id, cancellationToken);
             if (author == null) return null;
 
             return author.Adapt<AuthorDto>();
         }
 
-        public async Task AddAsync(AuthorDto authorDto)
+        public async Task AddAsync(AuthorDto authorDto, CancellationToken cancellationToken)
         {
             var author = authorDto.Adapt<Author>();
-            await _authorRepository.AddAsync(author);
+            await _authorRepository.AddAsync(author, cancellationToken);
         }
 
-        public async Task UpdateAsync(AuthorDto authorDto)
+        public async Task UpdateAsync(AuthorDto authorDto, CancellationToken cancellationToken)
         {
-            var author = await _authorRepository.GetByIdAsync(authorDto.Id);
+            var author = await _authorRepository.GetByIdAsync(authorDto.Id, cancellationToken);
             if (author == null)
                 throw new Exception("Author not found");
 
             authorDto.Adapt(author);
-            await _authorRepository.UpdateAsync(author);
+            await _authorRepository.UpdateAsync(author, cancellationToken);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            await _authorRepository.DeleteAsync(id);
+            await _authorRepository.DeleteAsync(id, cancellationToken);
         }
     }
 }

@@ -11,76 +11,140 @@ namespace Web_Library.API.Controllers
     {
         private readonly IBookService _bookService;
 
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
+
         public BooksController(IBookService bookService)
         {
             _bookService = bookService;
         }
+        private CancellationToken GetCancellationToken(CancellationToken cancellationToken)
+        {
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(_timeout);
+            return cts.Token;
+        }
 
         [HttpGet]
-        public async Task<IActionResult> GetBooks([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? title = null)
+        public async Task<IActionResult> GetBooks(CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? title = null)
         {
-            var (books, totalCount) = await _bookService.GetPaginatedBooksAsync(pageNumber, pageSize, title);
-            var bookDtos = books.Adapt<IEnumerable<BookDto>>();
-            return Ok(new { TotalCount = totalCount, Books = bookDtos });
+            try
+            {
+                var (books, totalCount) = await _bookService.GetPaginatedBooksAsync(pageNumber, pageSize, GetCancellationToken(cancellationToken), title);
+                var bookDtos = books.Adapt<IEnumerable<BookDto>>();
+                return Ok(new { TotalCount = totalCount, Books = bookDtos });
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBook(int id)
+        public async Task<IActionResult> GetBook(int id, CancellationToken cancellationToken)
         {
-            var book = await _bookService.GetByIdAsync(id);
-            if (book == null) return NotFound();
-            return Ok(book.Adapt<BookDto>());
+            try
+            {
+                var book = await _bookService.GetByIdAsync(id, GetCancellationToken(cancellationToken));
+                if (book == null) return NotFound();
+                return Ok(book.Adapt<BookDto>());
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBook([FromBody] BookDto bookDto)
+        public async Task<IActionResult> CreateBook([FromBody] BookDto bookDto, CancellationToken cancellationToken)
         {
-            await _bookService.AddAsync(bookDto);
-            return CreatedAtAction(nameof(GetBook), new { id = bookDto.Id }, bookDto);
+            try
+            {
+                await _bookService.AddAsync(bookDto, GetCancellationToken(cancellationToken));
+                return CreatedAtAction(nameof(GetBook), new { id = bookDto.Id }, bookDto);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(int id, [FromBody] BookDto bookDto)
+        public async Task<IActionResult> UpdateBook(int id, [FromBody] BookDto bookDto, CancellationToken cancellationToken)
         {
-            if (id != bookDto.Id) return BadRequest();
-            await _bookService.UpdateAsync(bookDto);
-            return NoContent();
+            try
+            {
+                if (id != bookDto.Id) return BadRequest();
+                await _bookService.UpdateAsync(bookDto, GetCancellationToken(cancellationToken));
+                return NoContent();
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBook(int id)
+        public async Task<IActionResult> DeleteBook(int id, CancellationToken cancellationToken)
         {
-            await _bookService.DeleteAsync(id);
-            return NoContent();
+            try
+            {
+                await _bookService.DeleteAsync(id, GetCancellationToken(cancellationToken));
+                return NoContent();
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpPost("issue/{bookId}")]
-        public async Task<IActionResult> IssueBook(int bookId)
+        public async Task<IActionResult> IssueBook(int bookId, CancellationToken cancellationToken)
         {
-            var username = User.Identity?.Name;
-            if (string.IsNullOrEmpty(username))
-                return Unauthorized("User not authenticated.");
+            try
+            {
+                var username = User.Identity?.Name;
+                if (string.IsNullOrEmpty(username))
+                    return Unauthorized("User not authenticated.");
 
-            var result = await _bookService.IssueBook(bookId, username);
-            if (!result) return BadRequest("Unable to issue book.");
-            return Ok("Book issued successfully!");
+                var result = await _bookService.IssueBook(bookId, username, GetCancellationToken(cancellationToken));
+                if (!result) return BadRequest("Unable to issue book.");
+                return Ok("Book issued successfully!");
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpGet("overdue")]
-        public async Task<IActionResult> GetOverdueBooks()
+        public async Task<IActionResult> GetOverdueBooks(CancellationToken cancellationToken)
         {
-            var books = await _bookService.GetOverdueBooksAsync();
-            return Ok(books.Adapt<IEnumerable<BookDto>>());
+            try
+            {
+                var books = await _bookService.GetOverdueBooksAsync(GetCancellationToken(cancellationToken));
+                return Ok(books.Adapt<IEnumerable<BookDto>>());
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpGet("user-overdue")]
-        public async Task<IActionResult> GetUserOverdueBooks()
+        public async Task<IActionResult> GetUserOverdueBooks(CancellationToken cancellationToken)
         {
-            var username = User.Identity?.Name;
-            if (string.IsNullOrEmpty(username))
-                return Unauthorized("User not authenticated.");
-            var books = await _bookService.GetOverdueBooksForUserAsync(username);
-            return Ok(books.Adapt<IEnumerable<BookDto>>());
+            try
+            {
+                var username = User.Identity?.Name;
+                if (string.IsNullOrEmpty(username))
+                    return Unauthorized("User not authenticated.");
+                var books = await _bookService.GetOverdueBooksForUserAsync(username, GetCancellationToken(cancellationToken));
+                return Ok(books.Adapt<IEnumerable<BookDto>>());
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
     }
 }

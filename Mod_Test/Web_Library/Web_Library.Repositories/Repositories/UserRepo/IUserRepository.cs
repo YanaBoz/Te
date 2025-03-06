@@ -4,13 +4,11 @@ namespace Web_Library.Repositories
 {
     public interface IUserRepository
     {
-        Task<User?> GetByUsernameAsync(string username);
-        Task<User?> GetByIdAsync(string userId);
-        Task AddAsync(User user);
-        Task UpdateAsync(User user);
-        Task DeleteAsync(string userId);
-        Task<List<Book>> GetBorrowedBooksAsync(string userId);
-        Task<User?> AuthenticateAsync(string username, string password);
-        Task<bool> RegisterAsync(User user, string password);
+        Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken);
+        Task<User?> GetByIdAsync(string userId, CancellationToken cancellationToken);
+        Task AddAsync(User user, CancellationToken cancellationToken);
+        Task UpdateAsync(User user, CancellationToken cancellationToken);
+        Task DeleteAsync(string userId, CancellationToken cancellationToken);
+        Task<List<Book>> GetBorrowedBooksAsync(string userId, CancellationToken cancellationToken);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Web_Library.DTOs;
-using Web_Library.Models;
 using Web_Library.Services;
+using Web_Library.Services.Notification;
 
 namespace Web_Library.API.Controllers
 {
@@ -11,74 +11,129 @@ namespace Web_Library.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ITokenService _tokenService;
-        public AuthController(IUserService userService, ITokenService tokenService)
+        private readonly INotificationService _notificationService;
+
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
+
+        public AuthController(IUserService userService, INotificationService notificationService)
         {
             _userService = userService;
-            _tokenService = tokenService;
+            _notificationService = notificationService;
+        }
+
+        private CancellationToken GetCancellationToken(CancellationToken cancellationToken)
+        {
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(_timeout);
+            return cts.Token;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto, CancellationToken cancellationToken)
         {
-            var user = await _userService.AuthenticateAsync(loginDto.Username, loginDto.Password);
-            if (user == null)
-                return Unauthorized("Invalid username or password");
+            try
+            {
+                var tokenResponse = await _userService.LoginAsync(loginDto, GetCancellationToken(cancellationToken));
+                if (tokenResponse == null)
+                    return Unauthorized("Invalid username or password");
 
-            var accessToken = _tokenService.GenerateAccessToken(user);
-            var refreshToken = _tokenService.GenerateRefreshToken(user.Id);
-            return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+                return Ok(tokenResponse);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto, CancellationToken cancellationToken)
         {
-            var success = await _userService.RegisterAsync(registerDto);
-            if (!success)
-                return BadRequest("Registration failed. Username may already be taken.");
-            return Ok(new { Message = "User registered successfully" });
+            try
+            {
+                var success = await _userService.RegisterAsync(registerDto, GetCancellationToken(cancellationToken));
+                if (!success)
+                    return BadRequest("Registration failed. Username may already be taken.");
+                return Ok(new { Message = "User registered successfully" });
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpPost("refresh")]
-        public IActionResult Refresh([FromBody] RefreshTokenDto tokenDto)
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto tokenDto, CancellationToken cancellationToken)
         {
-            var principal = _tokenService.GetPrincipalFromExpiredToken(tokenDto.AccessToken);
-            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null || !_tokenService.ValidateRefreshToken(userId, tokenDto.RefreshToken))
+            try
             {
-                return Unauthorized("Invalid refresh token");
+                var tokenResponse = await _userService.RefreshTokenAsync(tokenDto, GetCancellationToken(cancellationToken));
+                if (tokenResponse == null)
+                    return Unauthorized("Invalid refresh token");
+
+                return Ok(tokenResponse);
             }
-            var user = new User
+            catch (OperationCanceledException)
             {
-                Id = userId,
-                Username = principal.Identity?.Name ?? "",
-                Role = principal.FindFirst(ClaimTypes.Role)?.Value ?? "User"
-            };
-            var newAccessToken = _tokenService.GenerateAccessToken(user);
-            var newRefreshToken = _tokenService.GenerateRefreshToken(userId);
-            return Ok(new { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpGet("borrowed-books")]
-        public async Task<IActionResult> GetBorrowedBooks()
+        public async Task<IActionResult> GetBorrowedBooks(CancellationToken cancellationToken)
         {
-            var username = User.Identity?.Name;
-            if (string.IsNullOrEmpty(username))
-                return Unauthorized("User not authenticated.");
-            var books = await _userService.GetBorrowedBooksAsync(username);
-            return Ok(books);
+            try
+            {
+                var username = User.Identity?.Name;
+                if (string.IsNullOrEmpty(username))
+                    return Unauthorized("User not authenticated.");
+
+                var books = await _userService.GetBorrowedBooksAsync(username, GetCancellationToken(cancellationToken));
+                return Ok(books);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
+        }
+
+        [HttpGet("has-overdue-books")]
+        public async Task<IActionResult> HasOverdueBooks(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized("User not authenticated.");
+
+                bool hasOverdue = await _notificationService.UserHasOverdueBooksAsync(userId, GetCancellationToken(cancellationToken));
+                return Ok(new { Message = hasOverdue ? "You have overdue books!" : "No overdue books found." });
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
 
         [HttpGet("profile")]
-        public async Task<IActionResult> GetProfile()
+        public async Task<IActionResult> GetProfile(CancellationToken cancellationToken)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated.");
-            var userDto = await _userService.GetUserProfileAsync(userId);
-            if (userDto == null)
-                return NotFound("User not found.");
-            return Ok(userDto);
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null)
+                    return Unauthorized("User not authenticated.");
+
+                var userDto = await _userService.GetUserProfileAsync(userId, GetCancellationToken(cancellationToken));
+                if (userDto == null)
+                    return NotFound("User not found.");
+
+                return Ok(userDto);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Request Timeout");
+            }
         }
     }
 }
+

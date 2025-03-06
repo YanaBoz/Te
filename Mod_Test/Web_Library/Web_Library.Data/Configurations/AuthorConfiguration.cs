@@ -27,7 +27,8 @@ namespace Web_Library.Data.Configurations
 
             builder.HasMany(a => a.Books)
                 .WithOne()
-                .HasForeignKey(b => b.AuthorID);
+                .HasForeignKey(b => b.AuthorID)
+                .OnDelete(DeleteBehavior.Cascade); 
         }
     }
 }

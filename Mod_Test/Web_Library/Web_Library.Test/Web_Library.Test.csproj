@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Web_Library.API\Web_Library.API.csproj" />
+    <ProjectReference Include="..\Web_Library.Services\Web_Library.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

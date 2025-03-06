@@ -29,20 +29,25 @@ function App() {
     }, []);
 
     const fetchOverdueBooksCount = async (token) => {
+        const source = axios.CancelToken.source();
         try {
             const response = await axios.get(`${API_BASE_URL}/books/user-overdue`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
+                cancelToken: source.token
             });
             setOverdueBooksCount(response.data.length);
         } catch (error) {
             console.error('Error fetching overdue books:', error);
         }
+        return () => {
+            source.cancel('Request canceled.');
+        };
     };
 
     const handleLogout = () => {
         localStorage.removeItem('currentUser');
         setCurrentUser(null);
-        setOverdueBooksCount(0); // —брасываем счетчик при выходе
+        setOverdueBooksCount(0);
     };
 
     return (

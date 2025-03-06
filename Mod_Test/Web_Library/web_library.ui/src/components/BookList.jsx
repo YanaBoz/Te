@@ -9,23 +9,28 @@ const BookList = () => {
     const [displayedBooks, setDisplayedBooks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
-
-    const [genres, setGenres] = useState([]); // Добавляем жанры
+    const [genres, setGenres] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [genreFilter, setGenreFilter] = useState('');
     const [authorFilter, setAuthorFilter] = useState('');
-
     const [pageNumber, setPageNumber] = useState(1);
     const pageSize = 10;
+    const [totalBooks, setTotalBooks] = useState(0);
 
     const getCurrentUser = () => JSON.parse(localStorage.getItem('currentUser'));
     const currentUser = getCurrentUser();
     const token = currentUser ? currentUser.accessToken : '';
 
     useEffect(() => {
+        const cancelTokenSource = axios.CancelToken.source();
+
         fetchUserRole();
-        fetchBooks();
-        fetchGenres(); // Загружаем жанры при монтировании
+        fetchBooks(cancelTokenSource.token);
+        fetchGenres(cancelTokenSource.token);
+
+        return () => {
+            cancelTokenSource.cancel("Request canceled by user.");
+        };
     }, []);
 
     const fetchUserRole = async () => {
@@ -40,29 +45,37 @@ const BookList = () => {
         }
     };
 
-    const fetchBooks = async () => {
+    const fetchBooks = async (cancelToken) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${API_BASE_URL}/books`);
+            const response = await axios.get(`${API_BASE_URL}/books`, {
+                cancelToken,
+            });
             setBooks(response.data.books);
+            setTotalBooks(response.data.books.length);
             setFilteredBooks(response.data.books);
         } catch (error) {
-            console.error('Error fetching books:', error);
+            if (axios.isCancel(error)) {
+                console.log('Request canceled:', error.message);
+            } else {
+                console.error('Error fetching books:', error);
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    const fetchGenres = async () => {
+    const fetchGenres = async (cancelToken) => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/books/genres`);
-            setGenres(response.data); // Сохраняем жанры в состояние
+            const response = await axios.get(`${API_BASE_URL}/books/genres`, {
+                cancelToken,
+            });
+            setGenres(response.data);
         } catch (error) {
             console.error('Error fetching genres:', error);
         }
     };
 
-    // Фильтрация книг
     useEffect(() => {
         let filtered = books;
 
@@ -92,6 +105,8 @@ const BookList = () => {
         setDisplayedBooks(filteredBooks.slice(startIndex, endIndex));
     }, [filteredBooks, pageNumber]);
 
+    const totalPages = Math.ceil(totalBooks / pageSize);
+
     return (
         <div className="body">
             <h1>Books List</h1>
@@ -102,7 +117,6 @@ const BookList = () => {
                 </Link>
             )}
 
-            {/* Фильтры */}
             <div>
                 <input
                     type="text"
@@ -128,7 +142,6 @@ const BookList = () => {
                 />
             </div>
 
-            {/* Список книг */}
             {loading ? (
                 <p>Loading...</p>
             ) : (
@@ -145,7 +158,6 @@ const BookList = () => {
                         ))}
                     </ul>
 
-                    {/* Пагинация */}
                     <div>
                         <button
                             onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
@@ -153,13 +165,14 @@ const BookList = () => {
                         >
                             Previous
                         </button>
+                        <span> Page {pageNumber} of {totalPages} </span>
                         <button
                             onClick={() =>
                                 setPageNumber((prev) =>
-                                    prev * pageSize < filteredBooks.length ? prev + 1 : prev
+                                    prev < totalPages ? prev + 1 : prev
                                 )
                             }
-                            disabled={pageNumber * pageSize >= filteredBooks.length}
+                            disabled={pageNumber === totalPages}
                         >
                             Next
                         </button>

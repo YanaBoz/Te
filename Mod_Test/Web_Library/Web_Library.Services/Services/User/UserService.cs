@@ -1,61 +1,83 @@
-﻿using Web_Library.DTOs;
+﻿using System.Security.Claims;
+using Web_Library.DTOs;
 using Web_Library.Models;
 using Web_Library.Repositories;
+using Web_Library.Services.Services.Password;
+using Mapster;
+using Web_Library.Services.Notification;
+using System.Threading;
 
 namespace Web_Library.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+        private readonly ITokenService _tokenService;
+        private readonly IPasswordService _passwordService;
+        public UserService(IUserRepository userRepository, ITokenService tokenService, IPasswordService passwordService)
         {
             _userRepository = userRepository;
+            _tokenService = tokenService;
+            _passwordService = passwordService;
+        }
+        public async Task<RefreshTokenDto?> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetByUsernameAsync(loginDto.Username, cancellationToken);
+            if (user == null || !_passwordService.VerifyPassword(loginDto.Password, user.PasswordHash))
+                return null;
+
+            var accessToken = _tokenService.GenerateAccessToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken(user.Id);
+            return new RefreshTokenDto { AccessToken = accessToken, RefreshToken = refreshToken };
         }
 
-        public async Task<UserDto?> GetUserByUsernameAsync(string username)
+        public async Task<UserDto?> GetUserByUsernameAsync(string username, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByUsernameAsync(username);
+            var user = await _userRepository.GetByUsernameAsync(username, cancellationToken);
             if (user == null) return null;
-            return new UserDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                FullName = user.FullName,
-                Role = user.Role
-            };
+
+            return user.Adapt<UserDto>();
         }
 
-        public async Task<User?> AuthenticateAsync(string username, string password)
+        public async Task<RefreshTokenDto?> RefreshTokenAsync(RefreshTokenDto tokenDto, CancellationToken cancellationToken)
         {
-            return await _userRepository.AuthenticateAsync(username, password);
-        }
+            var principal = _tokenService.GetPrincipalFromExpiredToken(tokenDto.AccessToken);
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        public async Task<bool> RegisterAsync(RegisterDto registerDto)
-        {
-            var user = new User
-            {
-                Username = registerDto.Username,
-                FullName = registerDto.FullName
-            };
-            return await _userRepository.RegisterAsync(user, registerDto.Password);
-        }
+            if (userId == null || !_tokenService.ValidateRefreshToken(userId, tokenDto.RefreshToken))
+                return null;
 
-        public async Task<List<Book>> GetBorrowedBooksAsync(string userId)
-        {
-            return await _userRepository.GetBorrowedBooksAsync(userId);
-        }
-
-        public async Task<UserDto?> GetUserProfileAsync(string userId)
-        {
-            var user = await _userRepository.GetByIdAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
             if (user == null) return null;
-            return new UserDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                FullName = user.FullName,
-                Role = user.Role
-            };
+
+            var newAccessToken = _tokenService.GenerateAccessToken(user);
+            var newRefreshToken = _tokenService.GenerateRefreshToken(userId);
+            return new RefreshTokenDto { AccessToken = newAccessToken, RefreshToken = newRefreshToken };
+        }
+
+        public async Task<bool> RegisterAsync(RegisterDto registerDto, CancellationToken cancellationToken)
+        {
+            if (await _userRepository.GetByUsernameAsync(registerDto.Username, cancellationToken) != null)
+                return false;
+
+            var user = registerDto.Adapt<User>();
+            user.PasswordHash = _passwordService.HashPassword(registerDto.Password);
+
+            await _userRepository.AddAsync(user, cancellationToken);
+            return true;
+        }
+
+        public async Task<List<Book>> GetBorrowedBooksAsync(string userId, CancellationToken cancellationToken)
+        {
+            return await _userRepository.GetBorrowedBooksAsync(userId, cancellationToken);
+        }
+
+        public async Task<UserDto?> GetUserProfileAsync(string userId, CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+            if (user == null) return null;
+
+            return user.Adapt<UserDto>();
         }
     }
 }
