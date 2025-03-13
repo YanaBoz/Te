@@ -2,6 +2,7 @@
 using Moq;
 using Web_Library.API.Controllers;
 using Web_Library.DTOs;
+using Web_Library.Middleware.Exceptions;
 using Web_Library.Services;
 
 namespace Web_Library.Test
@@ -40,8 +41,7 @@ namespace Web_Library.Test
         {
             _mockAuthorService.Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>())).ThrowsAsync(new OperationCanceledException());
 
-            var result = await Assert.ThrowsAsync<TimeoutException>(() => _controller.GetAuthors(CancellationToken.None));
-            Assert.Equal("Request Timeout", result.Message);
+            await Assert.ThrowsAsync<OperationCanceledException>(() => _controller.GetAuthors(CancellationToken.None));
         }
 
         [Fact]
@@ -58,13 +58,13 @@ namespace Web_Library.Test
         }
 
         [Fact]
-        public async Task GetAuthor_ReturnsNotFound_WhenAuthorDoesNotExist()
+        public async Task GetAuthor_ThrowsNotFoundException_WhenAuthorDoesNotExist()
         {
-            _mockAuthorService.Setup(service => service.GetByIdAsync(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync((AuthorDto)null);
+            _mockAuthorService.Setup(service => service.GetByIdAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new NotFoundException("Author not found"));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _controller.GetAuthor(999, CancellationToken.None));
 
-            var result = await _controller.GetAuthor(999, CancellationToken.None);
-
-            Assert.IsType<NotFoundResult>(result);
+            Assert.Equal("Author not found", exception.Message);
         }
 
         [Fact]
@@ -121,8 +121,8 @@ namespace Web_Library.Test
             var authorDto = new AuthorDto { FirstName = "John", LastName = "Doe" };
             _mockAuthorService.Setup(service => service.AddAsync(It.IsAny<AuthorDto>(), It.IsAny<CancellationToken>())).ThrowsAsync(new OperationCanceledException());
 
-            var result = await Assert.ThrowsAsync<TimeoutException>(() => _controller.CreateAuthor(authorDto, CancellationToken.None));
-            Assert.Equal("Request Timeout", result.Message);
+            var result = await Assert.ThrowsAsync<OperationCanceledException>(() => _controller.CreateAuthor(authorDto, CancellationToken.None));
+            Assert.Equal("The operation was canceled.", result.Message);
         }
 
         [Fact]
@@ -131,8 +131,8 @@ namespace Web_Library.Test
             var authorDto = new AuthorDto { Id = 1, FirstName = "John", LastName = "Doe" };
             _mockAuthorService.Setup(service => service.UpdateAsync(It.IsAny<AuthorDto>(), It.IsAny<CancellationToken>())).ThrowsAsync(new OperationCanceledException());
 
-            var result = await Assert.ThrowsAsync<TimeoutException>(() => _controller.UpdateAuthor(1, authorDto, CancellationToken.None));
-            Assert.Equal("Request Timeout", result.Message);
+            var result = await Assert.ThrowsAsync<OperationCanceledException>(() => _controller.UpdateAuthor(1, authorDto, CancellationToken.None));
+            Assert.Equal("The operation was canceled.", result.Message);
         }
 
         [Fact]
@@ -140,8 +140,8 @@ namespace Web_Library.Test
         {
             _mockAuthorService.Setup(service => service.DeleteAsync(It.IsAny<int>(), It.IsAny<CancellationToken>())).ThrowsAsync(new OperationCanceledException());
 
-            var result = await Assert.ThrowsAsync<TimeoutException>(() => _controller.DeleteAuthor(1, CancellationToken.None));
-            Assert.Equal("Request Timeout", result.Message);
+            var result = await Assert.ThrowsAsync<OperationCanceledException>(() => _controller.DeleteAuthor(1, CancellationToken.None));
+            Assert.Equal("The operation was canceled.", result.Message);
         }
 
         public void Dispose()

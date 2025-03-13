@@ -48,7 +48,7 @@ namespace Web_Library.Repositories
         {
             var user = await _context.Users
                 .Include(u => u.BorrowedBooks)
-                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.Username == userId, cancellationToken);
             return user?.BorrowedBooks.ToList() ?? new List<Book>();
         }
     }

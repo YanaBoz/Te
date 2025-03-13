@@ -5,6 +5,7 @@ using Web_Library.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using Web_Library.Middleware.Exceptions;
 
 namespace Web_Library.Tests
 {
@@ -22,12 +23,13 @@ namespace Web_Library.Tests
         [Fact]
         public async Task GetBook_ReturnsNotFound_WhenBookNotExists()
         {
+            // Настроим mock-сервис так, чтобы метод GetByIdAsync возвращал null, если книга не найдена
             _mockBookService.Setup(service => service.GetByIdAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((BookDto)null);
+                .ThrowsAsync(new NotFoundException("Book not found"));
 
-            var result = await _controller.GetBook(1, CancellationToken.None);
+            var exception = await Assert.ThrowsAsync<NotFoundException>(() => _controller.GetBook(999, CancellationToken.None));
 
-            Assert.IsType<NotFoundResult>(result);
+            Assert.Equal("Book not found", exception.Message);
         }
 
         [Fact]
@@ -100,19 +102,22 @@ namespace Web_Library.Tests
         }
 
         [Fact]
-        public async Task IssueBook_ReturnsUnauthorized_WhenUserNotAuthenticated()
+        public async Task IssueBook_ThrowsUnauthorizedException_WhenUserNotAuthenticated()
         {
             var bookId = 1;
             _controller.ControllerContext = new ControllerContext
             {
-                HttpContext = new DefaultHttpContext()
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity())
+                }
             };
+            _mockBookService.Setup(service => service.IssueBook(bookId, null, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new UnauthorizedException("User not authenticated."));
 
-            var result = await _controller.IssueBook(bookId, CancellationToken.None);
-
-            var actionResult = Assert.IsType<UnauthorizedObjectResult>(result);
-            Assert.Equal("User not authenticated.", actionResult.Value);
+            await Assert.ThrowsAsync<UnauthorizedException>(() => _controller.IssueBook(bookId, CancellationToken.None));
         }
+
 
         public void Dispose()
         {

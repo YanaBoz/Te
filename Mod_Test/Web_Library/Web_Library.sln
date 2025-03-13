@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Library.Data", "Web_Lib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Library.DTOs", "DTOs\Web_Library.DTOs.csproj", "{F3464AC8-C352-4D10-BC4E-C70582883871}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Library.Middleware", "Web_Library.Middleware\Web_Library.Middleware.csproj", "{759AB915-1EE1-4428-8846-6FF0FF386CE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{F3464AC8-C352-4D10-BC4E-C70582883871}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3464AC8-C352-4D10-BC4E-C70582883871}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3464AC8-C352-4D10-BC4E-C70582883871}.Release|Any CPU.Build.0 = Release|Any CPU
+		{759AB915-1EE1-4428-8846-6FF0FF386CE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{759AB915-1EE1-4428-8846-6FF0FF386CE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{759AB915-1EE1-4428-8846-6FF0FF386CE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{759AB915-1EE1-4428-8846-6FF0FF386CE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

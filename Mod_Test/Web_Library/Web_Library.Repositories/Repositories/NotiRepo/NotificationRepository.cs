@@ -17,8 +17,7 @@ namespace Web_Library.Repositories.Repositories.NotiRepo
         {
             var user = await _context.Users
                 .Include(u => u.BorrowedBooks)
-                .ThenInclude(b => b.GenreNavigation) 
-                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.Username == userId, cancellationToken);
 
             if (user == null)
             {

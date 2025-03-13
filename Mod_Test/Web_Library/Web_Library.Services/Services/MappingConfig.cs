@@ -15,11 +15,32 @@ namespace Web_Library.Services
                 .Map(dest => dest.Books, src => src.Books.Adapt<List<Book>>());
 
             TypeAdapterConfig<Book, BookDto>.NewConfig()
-                .Map(dest => dest.Genre, src => src.GenreNavigation.Name);
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.ISBN, src => src.ISBN)
+            .Map(dest => dest.Title, src => src.Title)
+            .Map(dest => dest.Genre, src => src.Genre)
+            .Map(dest => dest.Description, src => src.Description)
+            .Map(dest => dest.BorrowedAt, src => src.BorrowedAt)
+            .Map(dest => dest.ReturnBy, src => src.ReturnBy)
+            .Map(dest => dest.ImageUrl, src => src.ImageUrl)
+            .Map(dest => dest.Quantity, src => src.Quantity)
+            .Map(dest => dest.IsNotified, src => src.IsNotified)
+            .Map(dest => dest.AuthorID, src => src.Author.Id)
+            .Map(dest => dest.AuthorName, src => $"{src.Author.FirstName} {src.Author.LastName}");
 
             TypeAdapterConfig<BookDto, Book>.NewConfig()
-                .Map(dest => dest.GenreNavigation.Name, src => src.Genre);
-            
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.ISBN, src => src.ISBN)
+                .Map(dest => dest.Title, src => src.Title)
+                .Map(dest => dest.Genre, src => src.Genre)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.BorrowedAt, src => src.BorrowedAt)
+                .Map(dest => dest.ReturnBy, src => src.ReturnBy)
+                .Map(dest => dest.ImageUrl, src => src.ImageUrl)
+                .Map(dest => dest.Quantity, src => src.Quantity)
+                .Map(dest => dest.IsNotified, src => src.IsNotified)
+                .Map(dest => dest.AuthorID, src => src.AuthorID);
+
             TypeAdapterConfig<User, UserDto>.NewConfig();
 
             TypeAdapterConfig<UserDto, User>.NewConfig()

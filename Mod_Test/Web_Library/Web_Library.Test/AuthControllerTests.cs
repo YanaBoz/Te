@@ -7,6 +7,9 @@ using Web_Library.DTOs;
 using Web_Library.Models;
 using Web_Library.Services;
 using Web_Library.Services.Notification;
+using Web_Library.Middleware.Exceptions;
+using Microsoft.Extensions.Logging;
+using Web_Library.Middleware;
 
 namespace Web_Library.Tests
 {
@@ -41,18 +44,22 @@ namespace Web_Library.Tests
         }
 
         [Fact]
-        public async Task Login_ReturnsUnauthorized_WhenInvalidCredentials()
+        public async Task Login_ShouldReturnUnauthorized_WhenCredentialsAreInvalid()
         {
             var loginDto = new LoginDto { Username = "wrongUser", Password = "wrongPassword" };
 
-            _mockUserService.Setup(s => s.LoginAsync(It.IsAny<LoginDto>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((RefreshTokenDto)null);
+            _mockUserService.Setup(s => s.LoginAsync(loginDto, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new UnauthorizedException("Invalid username or password"));
 
-            var result = await _controller.Login(loginDto, CancellationToken.None);
+            var httpContext = new DefaultHttpContext();
+            var middleware = new ExceptionHandlingMiddleware(Mock.Of<ILogger<ExceptionHandlingMiddleware>>());
 
-            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
-            Assert.Equal("Invalid username or password", unauthorizedResult.Value);
+            var requestDelegate = new RequestDelegate((ctx) => _controller.Login(loginDto, ctx.RequestAborted));
+            await middleware.InvokeAsync(httpContext, requestDelegate);
+
+            Assert.Equal(StatusCodes.Status401Unauthorized, httpContext.Response.StatusCode);
         }
+
 
         [Fact]
         public async Task Register_ReturnsOk_WhenSuccessful()
@@ -74,17 +81,14 @@ namespace Web_Library.Tests
 
 
         [Fact]
-        public async Task Register_ReturnsBadRequest_WhenUserAlreadyExists()
+        public async Task Register_ThrowsBadRequestException_WhenUserAlreadyExists()
         {
             var registerDto = new RegisterDto { Username = "existingUser", Password = "newPassword", FullName = "Existing User" };
 
             _mockUserService.Setup(s => s.RegisterAsync(It.IsAny<RegisterDto>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(false);
+                .ThrowsAsync(new BadRequestException("Username already taken"));
 
-            var result = await _controller.Register(registerDto, CancellationToken.None);
-
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Registration failed. Username may already be taken.", badRequestResult.Value);
+            await Assert.ThrowsAsync<BadRequestException>(() => _controller.Register(registerDto, CancellationToken.None));
         }
 
         [Fact]
@@ -105,17 +109,14 @@ namespace Web_Library.Tests
         }
 
         [Fact]
-        public async Task Refresh_ReturnsUnauthorized_WhenInvalidToken()
+        public async Task Refresh_ThrowsUnauthorizedException_WhenInvalidToken()
         {
             var refreshTokenDto = new RefreshTokenDto { RefreshToken = "invalidRefreshToken" };
 
             _mockUserService.Setup(s => s.RefreshTokenAsync(It.IsAny<RefreshTokenDto>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((RefreshTokenDto)null);
+                .ThrowsAsync(new UnauthorizedException("Invalid refresh token"));
 
-            var result = await _controller.Refresh(refreshTokenDto, CancellationToken.None);
-
-            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
-            Assert.Equal("Invalid refresh token", unauthorizedResult.Value);
+            await Assert.ThrowsAsync<UnauthorizedException>(() => _controller.Refresh(refreshTokenDto, CancellationToken.None));
         }
 
         [Fact]
@@ -150,18 +151,45 @@ namespace Web_Library.Tests
         }
 
         [Fact]
-        public async Task GetBorrowedBooks_ReturnsUnauthorized_WhenNotAuthenticated()
+        public async Task GetBorrowedBooks_ThrowsUnauthorizedException_WhenNotAuthenticated()
         {
             _controller.ControllerContext = new ControllerContext
             {
-                HttpContext = new DefaultHttpContext() 
+                HttpContext = new DefaultHttpContext()
             };
 
-            var result = await _controller.GetBorrowedBooks(CancellationToken.None);
+            _mockUserService.Setup(s => s.GetBorrowedBooksAsync(null, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new UnauthorizedException("User not authenticated."));
 
-            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
-            Assert.Equal("User not authenticated.", unauthorizedResult.Value);
+            await Assert.ThrowsAsync<UnauthorizedException>(() => _controller.GetBorrowedBooks(CancellationToken.None));
         }
+
+        [Fact]
+        public async Task Login_ReturnsUnauthorized_WhenOperationCanceled()
+        {
+            var loginDto = new LoginDto { Username = "testUser", Password = "password123" };
+            var cts = new CancellationTokenSource();
+
+            _mockUserService
+                .Setup(s => s.LoginAsync(It.IsAny<LoginDto>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new OperationCanceledException());
+
+            await Assert.ThrowsAsync<OperationCanceledException>(() => _controller.Login(loginDto, cts.Token));
+        }
+
+        [Fact]
+        public async Task Login_ReturnsRequestTimeout_WhenOperationCanceledAfterTimeout()
+        {
+            var loginDto = new LoginDto { Username = "testUser", Password = "password123" };
+            using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
+
+            _mockUserService
+                .Setup(s => s.LoginAsync(It.IsAny<LoginDto>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new TaskCanceledException());
+
+            await Assert.ThrowsAsync<TaskCanceledException>(() => _controller.Login(loginDto, cts.Token));
+        }
+
         public void Dispose()
         {
             // Dispose resources if necessary

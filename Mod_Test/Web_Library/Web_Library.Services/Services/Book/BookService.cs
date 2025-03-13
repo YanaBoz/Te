@@ -2,6 +2,7 @@
 using Web_Library.Models;
 using Web_Library.Repositories;
 using Mapster;
+using Web_Library.Middleware.Exceptions;
 
 namespace Web_Library.Services
 {
@@ -34,6 +35,7 @@ namespace Web_Library.Services
         public async Task<BookDto?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             var book = await _bookRepository.GetByIdAsync(id, cancellationToken);
+            if (book == null) throw new NotFoundException("Book not found");
             return book?.Adapt<BookDto>();
         }
 
@@ -48,7 +50,7 @@ namespace Web_Library.Services
         {
             var book = await _bookRepository.GetByIdAsync(bookDto.Id, cancellationToken);
             if (book == null)
-                throw new Exception("Book not found");
+                throw new NotFoundException("Book not found");
             bookDto.Adapt(book);
             book.GenreID = await _genreRepository.GetIdByNameAsync(bookDto.Genre, cancellationToken);
             await _bookRepository.UpdateAsync(book, cancellationToken);
@@ -61,15 +63,17 @@ namespace Web_Library.Services
 
         public async Task<bool> IssueBook(int bookId, string userId, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedException("User not authenticated.");
             var book = await _bookRepository.GetByIdAsync(bookId, cancellationToken);
             if (book == null)
-                throw new Exception("Book not found");
+                throw new NotFoundException("Book not found");
             if (book.Quantity <= 0)
                 throw new Exception("No copies available");
 
-            var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+            var user = await _userRepository.GetByUsernameAsync(userId, cancellationToken);
             if (user == null)
-                throw new Exception("User not found");
+                throw new NotFoundException("User not found");
 
             if (user.BorrowedBooks.Any(b => b.Id == book.Id))
                 throw new Exception("User has already borrowed this book");
@@ -92,6 +96,8 @@ namespace Web_Library.Services
 
         public async Task<IEnumerable<BookDto>> GetOverdueBooksForUserAsync(string userId, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedException("User not authenticated.");
             var books = await _bookRepository.GetOverdueBooksForUserAsync(userId, cancellationToken);
             return books.Adapt<IEnumerable<BookDto>>();
         }
@@ -101,7 +107,7 @@ namespace Web_Library.Services
             var booksByAuthor = books.Where(b => b.AuthorID == authorId).ToList();
 
             if (!booksByAuthor.Any())
-                throw new Exception("No books found for this author");
+                throw new NotFoundException("No books found for this author");
 
             foreach (var book in booksByAuthor)
             {

@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DTOs\Web_Library.DTOs.csproj" />
+    <ProjectReference Include="..\Web_Library.Middleware\Web_Library.Middleware.csproj" />
     <ProjectReference Include="..\Web_Library.Services\Web_Library.Services.csproj" />
   </ItemGroup>
 

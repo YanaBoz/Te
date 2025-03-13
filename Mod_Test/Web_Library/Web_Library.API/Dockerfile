@@ -1,34 +1,36 @@
-# Этап сборки
+# См. статью по ссылке https://aka.ms/customizecontainer, чтобы узнать как настроить контейнер отладки и как Visual Studio использует этот Dockerfile для создания образов для ускорения отладки.
+
+# Этот этап используется при запуске из VS в быстром режиме (по умолчанию для конфигурации отладки)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+
+# Этот этап используется для сборки проекта службы
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-
-# Копируем проект и восстанавливаем зависимости
-COPY Web_Library.API/Web_Library.API.csproj Web_Library.API/
-COPY DTOs/Web_Library.DTOs.csproj DTOs/
-COPY Web_Library.Services/Web_Library.Services.csproj Web_Library.Services/
-COPY Web_Library.Data/Web_Library.Data.csproj Web_Library.Data/
-COPY Web_Library.Models/Web_Library.Models.csproj Web_Library.Models/
-COPY Web_Library.Repositories/Web_Library.Repositories.csproj Web_Library.Repositories/
+COPY ["Web_Library.API/Web_Library.API.csproj", "Web_Library.API/"]
+COPY ["DTOs/Web_Library.DTOs.csproj", "DTOs/"]
+COPY ["Web_Library.Middleware/Web_Library.Middleware.csproj", "Web_Library.Middleware/"]
+COPY ["Web_Library.Services/Web_Library.Services.csproj", "Web_Library.Services/"]
+COPY ["Web_Library.Data/Web_Library.Data.csproj", "Web_Library.Data/"]
+COPY ["Web_Library.Models/Web_Library.Models.csproj", "Web_Library.Models/"]
+COPY ["Web_Library.Repositories/Web_Library.Repositories.csproj", "Web_Library.Repositories/"]
 RUN dotnet restore "./Web_Library.API/Web_Library.API.csproj"
-
-# Копируем все файлы
 COPY . .
-
-# Собираем проект
 WORKDIR "/src/Web_Library.API"
-RUN dotnet build "./Web_Library.API.csproj" -c Release -o /app/build
+RUN dotnet build "./Web_Library.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Этап публикации
+# Этот этап используется для публикации проекта службы, который будет скопирован на последний этап
 FROM build AS publish
-RUN dotnet publish "./Web_Library.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./Web_Library.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# Финальный этап
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS final
+# Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
+FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-# Добавление пути к глобальным инструментам в переменные окружения
-ENV PATH="$PATH:/root/.dotnet/tools"
-
-# Применение миграций при старте контейнера
-ENTRYPOINT ["sh", "-c", "dotnet Web_Library.API.dll"]
+ENTRYPOINT ["dotnet", "Web_Library.API.dll"]

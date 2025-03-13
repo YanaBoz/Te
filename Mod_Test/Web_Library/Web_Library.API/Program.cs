@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Web_Library.Data;
-using Web_Library.API.Middleware;
+using Web_Library.Middleware;
 using Web_Library.Services;
 using FluentValidation.AspNetCore;
 using FluentValidation;
-using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 

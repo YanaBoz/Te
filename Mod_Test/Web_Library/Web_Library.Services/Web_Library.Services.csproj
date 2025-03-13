@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DTOs\Web_Library.DTOs.csproj" />
     <ProjectReference Include="..\Web_Library.Data\Web_Library.Data.csproj" />
+    <ProjectReference Include="..\Web_Library.Middleware\Web_Library.Middleware.csproj" />
     <ProjectReference Include="..\Web_Library.Models\Web_Library.Models.csproj" />
     <ProjectReference Include="..\Web_Library.Repositories\Web_Library.Repositories.csproj" />
   </ItemGroup>

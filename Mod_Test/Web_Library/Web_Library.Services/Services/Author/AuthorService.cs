@@ -2,6 +2,7 @@
 using Web_Library.Models;
 using Web_Library.Repositories;
 using Mapster;
+using Web_Library.Middleware.Exceptions;
 
 namespace Web_Library.Services
 {
@@ -23,7 +24,7 @@ namespace Web_Library.Services
         public async Task<AuthorDto?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             var author = await _authorRepository.GetByIdAsync(id, cancellationToken);
-            if (author == null) return null;
+            if (author == null) throw new NotFoundException("Author not found");
 
             return author.Adapt<AuthorDto>();
         }
@@ -38,7 +39,7 @@ namespace Web_Library.Services
         {
             var author = await _authorRepository.GetByIdAsync(authorDto.Id, cancellationToken);
             if (author == null)
-                throw new Exception("Author not found");
+                throw new NotFoundException("Author not found");
 
             authorDto.Adapt(author);
             await _authorRepository.UpdateAsync(author, cancellationToken);

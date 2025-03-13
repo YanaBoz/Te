@@ -17,6 +17,5 @@ namespace Web_Library.Models
         public bool IsNotified { get; set; } = false;
         public int AuthorID { get; set; }
         public Author? Author { get; set; }
-        public Genre? GenreNavigation { get; set; }
     }
 }

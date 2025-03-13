@@ -1,4 +1,4 @@
-﻿namespace Web_Library.API.Exceptions
+﻿namespace Web_Library.Middleware.Exceptions
 {
     public class RequestTimeoutException : Exception
     {

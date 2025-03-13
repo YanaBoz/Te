@@ -16,7 +16,6 @@ namespace Web_Library.Repositories
         {
             return await _context.Books
                 .Include(b => b.Author)
-                .Include(b => b.GenreNavigation)
                 .ToListAsync();
         }
 
@@ -32,7 +31,6 @@ namespace Web_Library.Repositories
             var books = await query.Skip((pageNumber - 1) * pageSize)
                                    .Take(pageSize)
                                    .Include(b => b.Author)
-                                   .Include(b => b.GenreNavigation)
                                    .ToListAsync(cancellationToken); 
             return (books, totalCount);
         }
@@ -42,7 +40,6 @@ namespace Web_Library.Repositories
         {
             return await _context.Books
                 .Include(b => b.Author)
-                .Include(b => b.GenreNavigation)
                 .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
         }
 
@@ -50,7 +47,6 @@ namespace Web_Library.Repositories
         {
             return await _context.Books
                 .Include(b => b.Author)
-                .Include(b => b.GenreNavigation)
                 .FirstOrDefaultAsync(b => b.ISBN == isbn, cancellationToken);
         }
 
@@ -62,7 +58,8 @@ namespace Web_Library.Repositories
 
         public async Task UpdateAsync(Book book, CancellationToken cancellationToken)
         {
-            _context.Books.Update(book);
+            var existingBook = await _context.Books.FirstOrDefaultAsync(b => b.Id == book.Id, cancellationToken);
+            _context.Entry(existingBook).CurrentValues.SetValues(book);
             await _context.SaveChangesAsync(cancellationToken);
         }
 
@@ -81,7 +78,6 @@ namespace Web_Library.Repositories
             return await _context.Books
                 .Where(b => b.ReturnBy < DateTime.Now)
                 .Include(b => b.Author)
-                .Include(b => b.GenreNavigation)
                 .ToListAsync(cancellationToken);
         }
 
@@ -91,8 +87,7 @@ namespace Web_Library.Repositories
                 .Include(u => u.BorrowedBooks)
                 .ThenInclude(b => b.Author)
                 .Include(u => u.BorrowedBooks)
-                .ThenInclude(b => b.GenreNavigation)
-                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.Username == userId, cancellationToken);
             if (user == null)
                 return Enumerable.Empty<Book>();
             return user.BorrowedBooks.Where(b => b.ReturnBy < DateTime.Now).ToList();

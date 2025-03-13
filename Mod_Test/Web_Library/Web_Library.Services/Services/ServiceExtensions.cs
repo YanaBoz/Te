@@ -7,6 +7,7 @@ using Web_Library.Repositories;
 using Web_Library.Repositories.Repositories.NotiRepo;
 using Web_Library.Services.Notification;
 using Web_Library.Services.Services.Password;
+using Web_Library.Middleware;
 
 namespace Web_Library.Services
 {
@@ -50,6 +51,8 @@ namespace Web_Library.Services
 
             services.AddScoped<NotificationRepository>();
             services.AddScoped<INotificationService, NotificationService>();
+
+            services.AddTransient<ExceptionHandlingMiddleware>();
         }
     }
 }

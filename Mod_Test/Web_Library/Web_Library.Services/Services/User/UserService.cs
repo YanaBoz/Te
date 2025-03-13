@@ -6,6 +6,7 @@ using Web_Library.Services.Services.Password;
 using Mapster;
 using Web_Library.Services.Notification;
 using System.Threading;
+using Web_Library.Middleware.Exceptions;
 
 namespace Web_Library.Services
 {
@@ -24,7 +25,7 @@ namespace Web_Library.Services
         {
             var user = await _userRepository.GetByUsernameAsync(loginDto.Username, cancellationToken);
             if (user == null || !_passwordService.VerifyPassword(loginDto.Password, user.PasswordHash))
-                return null;
+                throw new UnauthorizedException("Invalid username or password");
 
             var accessToken = _tokenService.GenerateAccessToken(user);
             var refreshToken = _tokenService.GenerateRefreshToken(user.Id);
@@ -34,7 +35,7 @@ namespace Web_Library.Services
         public async Task<UserDto?> GetUserByUsernameAsync(string username, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByUsernameAsync(username, cancellationToken);
-            if (user == null) return null;
+            if (user == null) throw new NotFoundException("User not found");
 
             return user.Adapt<UserDto>();
         }
@@ -45,10 +46,10 @@ namespace Web_Library.Services
             var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userId == null || !_tokenService.ValidateRefreshToken(userId, tokenDto.RefreshToken))
-                return null;
+                throw new UnauthorizedException("Invalid refresh token");
 
             var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
-            if (user == null) return null;
+            if (user == null) throw new UnauthorizedException("Invalid refresh token");
 
             var newAccessToken = _tokenService.GenerateAccessToken(user);
             var newRefreshToken = _tokenService.GenerateRefreshToken(userId);
@@ -58,7 +59,7 @@ namespace Web_Library.Services
         public async Task<bool> RegisterAsync(RegisterDto registerDto, CancellationToken cancellationToken)
         {
             if (await _userRepository.GetByUsernameAsync(registerDto.Username, cancellationToken) != null)
-                return false;
+                throw new BadRequestException("Registration failed. Username may already be taken.");
 
             var user = registerDto.Adapt<User>();
             user.PasswordHash = _passwordService.HashPassword(registerDto.Password);
@@ -69,13 +70,17 @@ namespace Web_Library.Services
 
         public async Task<List<Book>> GetBorrowedBooksAsync(string userId, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedException("User not authenticated.");
             return await _userRepository.GetBorrowedBooksAsync(userId, cancellationToken);
         }
 
         public async Task<UserDto?> GetUserProfileAsync(string userId, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
-            if (user == null) return null;
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedException("User not authenticated.");
+            var user = await _userRepository.GetByUsernameAsync(userId, cancellationToken);
+            if (user == null) throw new NotFoundException("User not found.");
 
             return user.Adapt<UserDto>();
         }
