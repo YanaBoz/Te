@@ -23,7 +23,7 @@ docker-compose up -d --build
 ```
 
 ### 4. Проверка работы
-- **Backend (API):** http://localhost:8080/swagger
+- **Backend (API):** [http://localhost:8080/swagger](http://localhost:8080/swagger/index.html)
 - **Frontend (UI):** http://localhost:5005
 
 ## Дополнительные команды
