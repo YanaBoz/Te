@@ -7,6 +7,26 @@
       "RelativeMoniker": "D:0:0:{9F98A691-D979-45B1-8FE6-B95B8435A785}|Web_Library.API\\Web_Library.API.csproj|solutionrelative:web_library.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{DA32FC7D-6BE8-4BBE-9B15-61F6502DFE44}|Web_Library.Data\\Web_Library.Data.csproj|d:\\rep\\te\\mod_test\\web_library\\web_library.data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA32FC7D-6BE8-4BBE-9B15-61F6502DFE44}|Web_Library.Data\\Web_Library.Data.csproj|solutionrelative:web_library.data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA32FC7D-6BE8-4BBE-9B15-61F6502DFE44}|Web_Library.Data\\Web_Library.Data.csproj|d:\\rep\\te\\mod_test\\web_library\\web_library.data\\data\\dbseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA32FC7D-6BE8-4BBE-9B15-61F6502DFE44}|Web_Library.Data\\Web_Library.Data.csproj|solutionrelative:web_library.data\\data\\dbseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49D8AFB6-0024-4136-BFF0-AB836577A760}|Union{49D8AFB6-0024-4136-BFF0-AB836577A760}|D:\\Rep\\Te\\Mod_Test\\Web_Library\\docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{49D8AFB6-0024-4136-BFF0-AB836577A760}|Union{49D8AFB6-0024-4136-BFF0-AB836577A760}|solutionrelative:docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{11211E87-7302-4A40-A1BD-37ED29F3FDDE}|\u041D\u043E\u0432\u0430\u044F \u043F\u0430\u043F\u043A\u04301{11211E87-7302-4A40-A1BD-37ED29F3FDDE}|D:\\Rep\\Te\\Mod_Test\\Web_Library\\run_migrations.sh||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{11211E87-7302-4A40-A1BD-37ED29F3FDDE}|\u041D\u043E\u0432\u0430\u044F \u043F\u0430\u043F\u043A\u04301{11211E87-7302-4A40-A1BD-37ED29F3FDDE}|solutionrelative:run_migrations.sh||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DA32FC7D-6BE8-4BBE-9B15-61F6502DFE44}|Web_Library.Data\\Web_Library.Data.csproj|d:\\rep\\te\\mod_test\\web_library\\web_library.data\\migrations\\20250228002113_initialcreate1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DA32FC7D-6BE8-4BBE-9B15-61F6502DFE44}|Web_Library.Data\\Web_Library.Data.csproj|solutionrelative:web_library.data\\migrations\\20250228002113_initialcreate1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{4310F24E-6DAC-4B9B-8296-A323ED46927D}|Web_Library.Services\\Web_Library.Services.csproj|d:\\rep\\te\\mod_test\\web_library\\web_library.services\\services\\serviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4310F24E-6DAC-4B9B-8296-A323ED46927D}|Web_Library.Services\\Web_Library.Services.csproj|solutionrelative:web_library.services\\services\\serviceextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -78,7 +98,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 174,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Bookmark",
@@ -91,6 +111,71 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Web_Library.Data\\AppDbContext.cs",
+              "ToolTip": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Data\\AppDbContext.cs",
+              "RelativeToolTip": "Web_Library.Data\\AppDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-13T21:16:48.539Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DbSeeder.cs",
+              "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Data\\Data\\DbSeeder.cs",
+              "RelativeDocumentMoniker": "Web_Library.Data\\Data\\DbSeeder.cs",
+              "ToolTip": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Data\\Data\\DbSeeder.cs",
+              "RelativeToolTip": "Web_Library.Data\\Data\\DbSeeder.cs",
+              "ViewState": "AgIAADEAAAAAAAAAAAAiwF8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-13T21:16:39.145Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "run_migrations.sh",
+              "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\run_migrations.sh",
+              "RelativeDocumentMoniker": "run_migrations.sh",
+              "ToolTip": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\run_migrations.sh",
+              "RelativeToolTip": "run_migrations.sh",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-03-13T21:09:53.864Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "20250228002113_InitialCreate1.cs",
+              "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Data\\Migrations\\20250228002113_InitialCreate1.cs",
+              "RelativeDocumentMoniker": "Web_Library.Data\\Migrations\\20250228002113_InitialCreate1.cs",
+              "ToolTip": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Data\\Migrations\\20250228002113_InitialCreate1.cs",
+              "RelativeToolTip": "Web_Library.Data\\Migrations\\20250228002113_InitialCreate1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-13T21:06:43.72Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "docker-compose.yml",
+              "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\docker-compose.yml",
+              "RelativeDocumentMoniker": "docker-compose.yml",
+              "ToolTip": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\docker-compose.yml",
+              "RelativeToolTip": "docker-compose.yml",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAgwDsAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2025-03-13T20:57:07.492Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "ServiceExtensions.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Services\\Services\\ServiceExtensions.cs",
               "RelativeDocumentMoniker": "Web_Library.Services\\Services\\ServiceExtensions.cs",
@@ -102,7 +187,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "Dockerfile",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.API\\Dockerfile",
               "RelativeDocumentMoniker": "Web_Library.API\\Dockerfile",
@@ -120,14 +205,14 @@
               "RelativeDocumentMoniker": "Web_Library.API\\Program.cs",
               "ToolTip": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.API\\Program.cs",
               "RelativeToolTip": "Web_Library.API\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-13T19:47:51.022Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 8,
               "Title": "AuthorService.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Services\\Services\\Author\\AuthorService.cs",
               "RelativeDocumentMoniker": "Web_Library.Services\\Services\\Author\\AuthorService.cs",
@@ -139,7 +224,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 13,
               "Title": "AuthController.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.API\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "Web_Library.API\\Controllers\\AuthController.cs",
@@ -151,7 +236,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 14,
               "Title": "AuthorsController.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.API\\Controllers\\AuthorsController.cs",
               "RelativeDocumentMoniker": "Web_Library.API\\Controllers\\AuthorsController.cs",
@@ -163,7 +248,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 15,
               "Title": "BooksController.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.API\\Controllers\\BooksController.cs",
               "RelativeDocumentMoniker": "Web_Library.API\\Controllers\\BooksController.cs",
@@ -175,7 +260,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 12,
               "Title": "AlreadyExistsException.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Middleware\\Exceptions\\AlreadyExistsException.cs",
               "RelativeDocumentMoniker": "Web_Library.Middleware\\Exceptions\\AlreadyExistsException.cs",
@@ -187,7 +272,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 11,
               "Title": "ExceptionHandlingMiddleware.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Middleware\\ExceptionHandlingMiddleware.cs",
               "RelativeDocumentMoniker": "Web_Library.Middleware\\ExceptionHandlingMiddleware.cs",
@@ -199,7 +284,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 10,
               "Title": "UserService.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Services\\Services\\User\\UserService.cs",
               "RelativeDocumentMoniker": "Web_Library.Services\\Services\\User\\UserService.cs",
@@ -211,7 +296,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "BookService.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Services\\Services\\Book\\BookService.cs",
               "RelativeDocumentMoniker": "Web_Library.Services\\Services\\Book\\BookService.cs",
@@ -223,7 +308,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 16,
               "Title": "BooksControllerTests.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Test\\BooksControllerTests.cs",
               "RelativeDocumentMoniker": "Web_Library.Test\\BooksControllerTests.cs",
@@ -235,7 +320,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 17,
               "Title": "Web_Library.Services.csproj",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Services\\Web_Library.Services.csproj",
               "RelativeDocumentMoniker": "Web_Library.Services\\Web_Library.Services.csproj",
@@ -247,7 +332,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 20,
               "Title": "AuthorsControllerTests.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Test\\AuthorsControllerTests.cs",
               "RelativeDocumentMoniker": "Web_Library.Test\\AuthorsControllerTests.cs",
@@ -259,7 +344,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 19,
               "Title": "AuthControllerTests.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Test\\AuthControllerTests.cs",
               "RelativeDocumentMoniker": "Web_Library.Test\\AuthControllerTests.cs",
@@ -271,7 +356,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 18,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.API\\appsettings.json",
               "RelativeDocumentMoniker": "Web_Library.API\\appsettings.json",
@@ -283,7 +368,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 21,
               "Title": "AuthorRepositoryTests.cs",
               "DocumentMoniker": "D:\\Rep\\Te\\Mod_Test\\Web_Library\\Web_Library.Test\\AuthorRepositoryTests.cs",
               "RelativeDocumentMoniker": "Web_Library.Test\\AuthorRepositoryTests.cs",

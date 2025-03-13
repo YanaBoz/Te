@@ -64,24 +64,13 @@ namespace Web_Library.Data.Migrations
                     b.Property<int>("AuthorID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AuthorId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("BorrowedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Genre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("GenreID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("GenreNavigationId")
+                    b.Property<int?>("GenreID")
                         .HasColumnType("int");
 
                     b.Property<string>("ISBN")
@@ -117,11 +106,10 @@ namespace Web_Library.Data.Migrations
 
                     b.HasIndex("AuthorID");
 
-                    b.HasIndex("AuthorId");
-
                     b.HasIndex("GenreID");
 
-                    b.HasIndex("GenreNavigationId");
+                    b.HasIndex("ISBN")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -201,25 +189,16 @@ namespace Web_Library.Data.Migrations
 
             modelBuilder.Entity("Web_Library.Models.Book", b =>
                 {
-                    b.HasOne("Web_Library.Models.Author", null)
+                    b.HasOne("Web_Library.Models.Author", "Author")
                         .WithMany("Books")
                         .HasForeignKey("AuthorID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Web_Library.Models.Author", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId");
-
-                    b.HasOne("Web_Library.Models.Genre", null)
-                        .WithMany()
-                        .HasForeignKey("GenreID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Web_Library.Models.Genre", "GenreNavigation")
+                    b.HasOne("Web_Library.Models.Genre", "Genre")
                         .WithMany("Books")
-                        .HasForeignKey("GenreNavigationId");
+                        .HasForeignKey("GenreID")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Web_Library.Models.User", null)
                         .WithMany("BorrowedBooks")
@@ -227,7 +206,7 @@ namespace Web_Library.Data.Migrations
 
                     b.Navigation("Author");
 
-                    b.Navigation("GenreNavigation");
+                    b.Navigation("Genre");
                 });
 
             modelBuilder.Entity("Web_Library.Models.RefreshToken", b =>

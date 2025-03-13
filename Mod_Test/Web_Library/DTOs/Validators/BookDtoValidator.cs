@@ -15,9 +15,8 @@ namespace Web_Library.Validators
                 .NotEmpty().WithMessage("Title is required")
                 .MaximumLength(200).WithMessage("Title cannot exceed 200 characters");
 
-            RuleFor(b => b.Genre)
-                .NotEmpty().WithMessage("Genre is required")
-                .MaximumLength(100).WithMessage("Genre cannot exceed 100 characters");
+            RuleFor(b => b.GenreID)
+                .NotEmpty().WithMessage("Genre is required");
 
             RuleFor(b => b.Description)
                 .NotNull().WithMessage("Description must be provided");

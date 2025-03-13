@@ -42,7 +42,10 @@ namespace Web_Library.Services
         public async Task AddAsync(BookDto bookDto, CancellationToken cancellationToken)
         {
             var book = bookDto.Adapt<Book>();
-            book.GenreID = await _genreRepository.GetIdByNameAsync(bookDto.Genre, cancellationToken);
+            var genre = await _genreRepository.GetByIdAsync(bookDto.GenreID, cancellationToken);
+            if (genre == null) throw new NotFoundException("Genre not found");
+            book.Genre = genre;
+
             await _bookRepository.AddAsync(book, cancellationToken);
         }
 
@@ -51,8 +54,12 @@ namespace Web_Library.Services
             var book = await _bookRepository.GetByIdAsync(bookDto.Id, cancellationToken);
             if (book == null)
                 throw new NotFoundException("Book not found");
+
             bookDto.Adapt(book);
-            book.GenreID = await _genreRepository.GetIdByNameAsync(bookDto.Genre, cancellationToken);
+
+            var genre = await _genreRepository.GetByIdAsync(bookDto.GenreID, cancellationToken);
+            if (genre == null) throw new NotFoundException("Genre not found");
+
             await _bookRepository.UpdateAsync(book, cancellationToken);
         }
 

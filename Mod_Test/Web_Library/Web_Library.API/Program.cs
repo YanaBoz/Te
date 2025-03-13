@@ -59,7 +59,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ѕрименение миграций и начальна€ загрузка данных
+// ѕрименение миграций и начальна€ загрузка данных oI1Eo3caHqHBLxOGAL6KI9JbA0ITWnY6IsKsHgcpcio
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();

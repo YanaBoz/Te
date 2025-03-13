@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Web_Library.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate1 : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -63,8 +63,7 @@ namespace Web_Library.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ISBN = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Genre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    GenreID = table.Column<int>(type: "int", nullable: false),
+                    GenreID = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BorrowedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ReturnBy = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -72,8 +71,6 @@ namespace Web_Library.Data.Migrations
                     Quantity = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     IsNotified = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     AuthorID = table.Column<int>(type: "int", nullable: false),
-                    AuthorId = table.Column<int>(type: "int", nullable: true),
-                    GenreNavigationId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -86,21 +83,11 @@ namespace Web_Library.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Books_Authors_AuthorId",
-                        column: x => x.AuthorId,
-                        principalTable: "Authors",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Books_Genres_GenreID",
                         column: x => x.GenreID,
                         principalTable: "Genres",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Books_Genres_GenreNavigationId",
-                        column: x => x.GenreNavigationId,
-                        principalTable: "Genres",
-                        principalColumn: "Id");
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Books_Users_UserId",
                         column: x => x.UserId,
@@ -130,11 +117,6 @@ namespace Web_Library.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Books_AuthorId",
-                table: "Books",
-                column: "AuthorId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Books_AuthorID",
                 table: "Books",
                 column: "AuthorID");
@@ -145,9 +127,10 @@ namespace Web_Library.Data.Migrations
                 column: "GenreID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Books_GenreNavigationId",
+                name: "IX_Books_ISBN",
                 table: "Books",
-                column: "GenreNavigationId");
+                column: "ISBN",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Books_UserId",

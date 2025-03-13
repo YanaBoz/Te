@@ -26,6 +26,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Library.DTOs", "DTOs\We
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Library.Middleware", "Web_Library.Middleware\Web_Library.Middleware.csproj", "{759AB915-1EE1-4428-8846-6FF0FF386CE5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "init", "init", "{11211E87-7302-4A40-A1BD-37ED29F3FDDE}"
+	ProjectSection(SolutionItems) = preProject
+		run_migrations.sh = run_migrations.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

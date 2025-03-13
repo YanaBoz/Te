@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
@@ -5,13 +7,20 @@ services:
     environment:
       SA_PASSWORD: "Kolobok@12345"
       ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
     ports:
       - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "sqlcmd -U sa -P Kolobok@12345 -Q 'SELECT 1'"]
-      interval: 30s
-      retries: 3
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P Kolobok@12345 -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      retries: 10
       start_period: 30s
+      timeout: 3s
+    networks:
+      - mynetwork
 
   web:
     build:
@@ -24,15 +33,17 @@ services:
       - "8081:8081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Data Source=db,1433;Initial Catalog=LibraryDB;User ID=sa;Password=Kolobok@12345;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=LibraryDB;User Id=sa;Password=Kolobok@12345;TrustServerCertificate=True;
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/Books"]
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/api/Books || exit 1"]
       interval: 60s
       retries: 5
       start_period: 30s
+    networks:
+      - mynetwork
 
   ui:
     build:
@@ -45,8 +56,12 @@ services:
         condition: service_healthy
     environment:
       - API_BASE_URL=http://web:8080
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80"]
-      interval: 30s
-      retries: 3
-      start_period: 30s
+    networks:
+      - mynetwork
+
+volumes:
+  sqlserver_data:
+
+networks:
+  mynetwork:
+    driver: bridge

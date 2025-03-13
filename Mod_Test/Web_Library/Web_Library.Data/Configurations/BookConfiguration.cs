@@ -21,10 +21,6 @@ namespace Web_Library.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(b => b.Genre)
-                .IsRequired()
-                .HasMaxLength(100);
-
             builder.Property(b => b.Description)
                 .IsRequired(false);
 
@@ -34,10 +30,16 @@ namespace Web_Library.Data.Configurations
             builder.Property(b => b.IsNotified)
                 .HasDefaultValue(false);
 
-            builder.HasOne<Genre>()
-                .WithMany()
-                .HasForeignKey(b => b.GenreID)
-                .OnDelete(DeleteBehavior.SetNull);
+            builder.HasOne(b => b.Author)
+                .WithMany(a => a.Books)
+                .HasForeignKey(b => b.AuthorID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(b => b.Genre)
+                   .WithMany(g => g.Books)
+                   .HasForeignKey(b => b.GenreID)
+                   .OnDelete(DeleteBehavior.SetNull);
+
         }
     }
 }
